@@ -292,22 +292,22 @@ extern void (*osal_eventloop_hook)(void);
   /*
    * Memory copy
    */
-  extern void *osal_memcpy( void*, const void *, unsigned int);
+  extern void *osal_memcpy( void*, const void GENERIC *, unsigned int);
 
   /*
    * Memory Duplicate - allocates and copies
    */
-  extern void *osal_memdup( const void *, unsigned int );
+  extern void *osal_memdup( const void GENERIC *, unsigned int );
 
   /*
    * Reverse Memory copy
    */
-  extern void *osal_revmemcpy( void*, const void *src, unsigned int );
+  extern void *osal_revmemcpy( void*, const void GENERIC *src, unsigned int );
 
   /*
    * Memory compare
    */
-  extern uint8 osal_memcmp( const void *src1, const void *src2, unsigned int len );
+  extern uint8 osal_memcmp( const void GENERIC *src1, const void GENERIC *src2, unsigned int len );
 
   /*
    * Memory set

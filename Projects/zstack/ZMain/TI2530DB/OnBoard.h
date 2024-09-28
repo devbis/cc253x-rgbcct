@@ -279,7 +279,7 @@ typedef struct
 
   /* Measure voltage and report */
   extern bool OnBoard_CheckVoltage( void );
-  
+
 /* LCD Emulation/Control Functions */
   /*
    * Convert an interger to an ascii string
@@ -334,7 +334,7 @@ typedef struct
   /*
    * Board specific soft reset.
    */
-  extern void Onboard_soft_reset( void );
+  extern __near_func void Onboard_soft_reset( void );
 
 /*********************************************************************
 *********************************************************************/
