@@ -494,7 +494,7 @@
                     <state>$PROJ_DIR$\..\..\Source</state>
                     <state>$PROJ_DIR$\..\..\..\ZMain\TI2530DB</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\high_level</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04</state>
@@ -1655,7 +1655,7 @@
                     <state>$PROJ_DIR$\..\..\Source</state>
                     <state>$PROJ_DIR$\..\..\..\ZMain\TI2530DB</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\high_level</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04</state>
@@ -2819,7 +2819,7 @@
                     <state>$PROJ_DIR$\..\..\Source</state>
                     <state>$PROJ_DIR$\..\..\..\ZMain\TI2530DB</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\high_level</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04</state>
@@ -3499,13 +3499,13 @@
             <name>$PROJ_DIR$\..\..\Source\zcl_sampleapps_ui.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Source\zcl_samplelight.c</name>
+            <name>$PROJ_DIR$\..\Source\zcl_rgblight.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Source\zcl_samplelight.h</name>
+            <name>$PROJ_DIR$\..\Source\zcl_rgblight.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Source\zcl_samplelight_data.c</name>
+            <name>$PROJ_DIR$\..\Source\zcl_rgblight_data.c</name>
         </file>
     </group>
     <group>
@@ -3631,58 +3631,58 @@
                 <group>
                     <name>Config</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_board_cfg.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_board_cfg.h</name>
                     </file>
                 </group>
                 <group>
                     <name>Drivers</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_adc.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_adc.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_dma.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_dma.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_flash.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_flash.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_key.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_key.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_lcd.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_lcd.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_led.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_led.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_sleep.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_sleep.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_startup.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_startup.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_timer.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_timer.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_uart.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_uart.c</name>
                     </file>
                 </group>
                 <group>
                     <name>Includes</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_aes.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_aes.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_ccm.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_ccm.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_dma.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_dma.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_mcu.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_mcu.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_types.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530LC\hal_types.h</name>
                     </file>
                 </group>
             </group>
