@@ -22,7 +22,7 @@
   its documentation for any purpose.
 
   YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
-  PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+  PROVIDED ï¿½AS ISï¿½ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
   INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
   NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
   TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -50,7 +50,7 @@ extern "C"
  * INCLUDES
  */
 #include "hw_light_ctrl.h"
-#include "zll_samplelight.h"
+#include "zcl_general.h"
 
 /*********************************************************************
  * CONSTANTS
@@ -75,8 +75,8 @@ extern "C"
  */
 
 // Level control Cluster (server) -----------------------------------------------------
-extern uint8 zclLevel_CurrentLevel;
-extern uint16 zclLevel_LevelRemainingTime;
+extern uint8 zclSampleLight_LevelCurrentLevel;
+extern uint16 zclSampleLight_LevelRemainingTime;
 
 /*********************************************************************
  * FUNCTIONS

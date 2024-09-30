@@ -54,7 +54,8 @@ extern "C"
 
 #include "zcl_lighting.h"
 #include "hw_light_ctrl.h"
-//#include "zll_samplelight.h"
+#include "zcl_general.h"
+#include "zcl_rgblight.h"
 
 /*********************************************************************
  * CONSTANTS

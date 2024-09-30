@@ -70,16 +70,22 @@ extern "C"
 #define SAMPLELIGHT_POLL_CONTROL_TIMEOUT_EVT  0x0001
 #define SAMPLELIGHT_LEVEL_CTRL_EVT            0x0002
 #define SAMPLEAPP_END_DEVICE_REJOIN_EVT       0x0004
+#define SAMPLELIGHT_LEVEL_PROCESS_EVT        0x0008
+#define SAMPLELIGHT_COLOR_PROCESS_EVT        0x0010
+#define SAMPLELIGHT_COLOR_LOOP_PROCESS_EVT   0x0020
 
 // UI Events
-#define SAMPLEAPP_LCD_AUTO_UPDATE_EVT         0x0010
-#define SAMPLEAPP_KEY_AUTO_REPEAT_EVT         0x0020
+//#define SAMPLEAPP_LCD_AUTO_UPDATE_EVT         0x0010
+//#define SAMPLEAPP_KEY_AUTO_REPEAT_EVT         0x0020
 
 #define SAMPLEAPP_END_DEVICE_REJOIN_DELAY 10000
 
 /*********************************************************************
  * MACROS
  */
+#define SCENE_VALID() zclSampleLight_ScenesSceneValid = 1;
+#define SCENE_INVALID() zclSampleLight_ScenesSceneValid = 0;
+
 /*********************************************************************
  * TYPEDEFS
  */

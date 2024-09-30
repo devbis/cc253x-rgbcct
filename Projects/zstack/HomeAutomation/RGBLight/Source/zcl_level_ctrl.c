@@ -24,7 +24,7 @@
   its documentation for any purpose.
 
   YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
-  PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+  PROVIDED ï¿½AS ISï¿½ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
   INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
   NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
   TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -106,11 +106,11 @@ void zclLevel_init( byte taskID, zclGCB_OnOff_t OnOffCB )
   zclLevel_OnOffCB = OnOffCB;
 
   //Move lamp to default level
-  zclLevel_LevelRemainingTime = 0;
-   hwLight_ApplyUpdate( &zclLevel_CurrentLevel,
+  zclSampleLight_LevelRemainingTime = 0;
+   hwLight_ApplyUpdate( &zclSampleLight_LevelCurrentLevel,
                         &zclLevel_CurrentLevel_256,
                         &zclLevel_StepLevel_256,
-                        &zclLevel_LevelRemainingTime,
+                        &zclSampleLight_LevelRemainingTime,
                         LEVEL_MIN, LEVEL_MAX, FALSE );
 }
 
@@ -128,15 +128,15 @@ void zclLevel_process( uint16 *events )
   if ( *events & LEVEL_PROCESS_EVT )
   {
     //update the level
-    if(zclLevel_LevelRemainingTime)
+    if(zclSampleLight_LevelRemainingTime)
     {
-      hwLight_ApplyUpdate( &zclLevel_CurrentLevel,
+      hwLight_ApplyUpdate( &zclSampleLight_LevelCurrentLevel,
                            &zclLevel_CurrentLevel_256,
                            &zclLevel_StepLevel_256,
-                           &zclLevel_LevelRemainingTime,
+                           &zclSampleLight_LevelRemainingTime,
                            LEVEL_MIN, LEVEL_MAX, FALSE );
 
-      if( (zclLevel_CurrentLevel == LEVEL_MIN) && (zclLevel_LevelWithOnOff) )
+      if( (zclSampleLight_LevelCurrentLevel == LEVEL_MIN) && (zclLevel_LevelWithOnOff) )
       {
         zclLevel_OnOffCB(COMMAND_OFF);
       }
@@ -144,7 +144,7 @@ void zclLevel_process( uint16 *events )
 
     if(zclLevel_LevelWithOnOff)
     {
-      if(zclLevel_CurrentLevel == LEVEL_MIN)
+      if(zclSampleLight_LevelCurrentLevel == LEVEL_MIN)
       {
         zclLevel_OnOffCB(COMMAND_OFF);
       }
@@ -154,7 +154,7 @@ void zclLevel_process( uint16 *events )
       }
     }
 
-    if (zclLevel_LevelRemainingTime)
+    if (zclSampleLight_LevelRemainingTime)
     {
       //set a timer to make the change over zclLevel_StepTime 100ms
       osal_start_timerEx( zclLight_TaskID, LEVEL_PROCESS_EVT , 100 );
@@ -185,19 +185,19 @@ void zclLevel_MoveToLevelCB( zclLCMoveToLevel_t *pCmd )
   //if transition time = 0 then do immediately
   if ( pCmd->transitionTime == 0 )
   {
-      zclLevel_LevelRemainingTime = 1;
+      zclSampleLight_LevelRemainingTime = 1;
   }
   else
   {
-    zclLevel_LevelRemainingTime = pCmd->transitionTime;
+    zclSampleLight_LevelRemainingTime = pCmd->transitionTime;
   }
-    zclLevel_StepLevel_256 = ((int32)(pCmd->level - zclLevel_CurrentLevel))<<8;
-    zclLevel_StepLevel_256 /= (int32)zclLevel_LevelRemainingTime;
+    zclLevel_StepLevel_256 = ((int32)(pCmd->level - zclSampleLight_LevelCurrentLevel))<<8;
+    zclLevel_StepLevel_256 /= (int32)zclSampleLight_LevelRemainingTime;
 
-  hwLight_ApplyUpdate( &zclLevel_CurrentLevel,
+  hwLight_ApplyUpdate( &zclSampleLight_LevelCurrentLevel,
                        &zclLevel_CurrentLevel_256,
                        &zclLevel_StepLevel_256,
-                       &zclLevel_LevelRemainingTime,
+                       &zclSampleLight_LevelRemainingTime,
                        LEVEL_MIN, LEVEL_MAX, FALSE );
 
   if ( zclLevel_LevelWithOnOff )
@@ -206,13 +206,13 @@ void zclLevel_MoveToLevelCB( zclLCMoveToLevel_t *pCmd )
     {
       zclLevel_OnOffCB(COMMAND_ON);
     }
-    else if( (zclLevel_CurrentLevel == LEVEL_MIN) && (zclLevel_LevelWithOnOff) )
+    else if( (zclSampleLight_LevelCurrentLevel == LEVEL_MIN) && (zclLevel_LevelWithOnOff) )
     {
       zclLevel_OnOffCB(COMMAND_OFF);
     }
   }
 
-  if (zclLevel_LevelRemainingTime)
+  if (zclSampleLight_LevelRemainingTime)
   {
     //set a timer to make the change over zclLevel_StepTime 100ms
     osal_start_timerEx( zclLight_TaskID, LEVEL_PROCESS_EVT , 100 );
@@ -253,20 +253,20 @@ void zclLevel_MoveCB( zclLCMove_t *pCmd )
   }
 
   //Change for ever - level stop call back will stop this command
-  zclLevel_LevelRemainingTime = 0xFFFF;
+  zclSampleLight_LevelRemainingTime = 0xFFFF;
 
-  hwLight_ApplyUpdate( &zclLevel_CurrentLevel,
+  hwLight_ApplyUpdate( &zclSampleLight_LevelCurrentLevel,
                        &zclLevel_CurrentLevel_256,
                        &zclLevel_StepLevel_256,
-                       &zclLevel_LevelRemainingTime,
+                       &zclSampleLight_LevelRemainingTime,
                        LEVEL_MIN, LEVEL_MAX, FALSE);
 
-  if( (zclLevel_CurrentLevel == LEVEL_MIN) && (zclLevel_LevelWithOnOff) )
+  if( (zclSampleLight_LevelCurrentLevel == LEVEL_MIN) && (zclLevel_LevelWithOnOff) )
   {
     zclLevel_OnOffCB(COMMAND_OFF);
   }
 
-  if (zclLevel_LevelRemainingTime)
+  if (zclSampleLight_LevelRemainingTime)
   {
     //set a timer to make the change over zclLevel_StepTime 100ms
     osal_start_timerEx( zclLight_TaskID, LEVEL_PROCESS_EVT , 100);
@@ -291,14 +291,14 @@ void zclLevel_StepCB(zclLCStep_t *pCmd )
 
   if ( (pCmd->transitionTime == 0) || (pCmd->transitionTime == 0xFFFF) )
   {
-    zclLevel_LevelRemainingTime = 1;
+    zclSampleLight_LevelRemainingTime = 1;
   }
   else
   {
-    zclLevel_LevelRemainingTime = pCmd->transitionTime;
+    zclSampleLight_LevelRemainingTime = pCmd->transitionTime;
   }
 
-  zclLevel_StepLevel_256 = ((((int32)pCmd->amount)<<8) / zclLevel_LevelRemainingTime);
+  zclLevel_StepLevel_256 = ((((int32)pCmd->amount)<<8) / zclSampleLight_LevelRemainingTime);
   switch (pCmd->stepMode)
   {
     case LEVEL_STEP_UP:
@@ -312,18 +312,18 @@ void zclLevel_StepCB(zclLCStep_t *pCmd )
       break;
   }
 
-  hwLight_ApplyUpdate( &zclLevel_CurrentLevel,
+  hwLight_ApplyUpdate( &zclSampleLight_LevelCurrentLevel,
                        &zclLevel_CurrentLevel_256,
                        &zclLevel_StepLevel_256,
-                       &zclLevel_LevelRemainingTime,
+                       &zclSampleLight_LevelRemainingTime,
                        LEVEL_MIN, LEVEL_MAX, FALSE );
 
-  if( (zclLevel_CurrentLevel == LEVEL_MIN) && (zclLevel_LevelWithOnOff) )
+  if( (zclSampleLight_LevelCurrentLevel == LEVEL_MIN) && (zclLevel_LevelWithOnOff) )
   {
     zclLevel_OnOffCB(COMMAND_OFF);
   }
 
-  if (zclLevel_LevelRemainingTime)
+  if (zclSampleLight_LevelRemainingTime)
   {
     //set a timer to make the change over zclLevel_StepTime 100ms
     osal_start_timerEx( zclLight_TaskID, LEVEL_PROCESS_EVT , 100 );
@@ -349,9 +349,9 @@ void zclLevel_StepCB(zclLCStep_t *pCmd )
 void zclLevel_StopCB( void )
 {
     osal_stop_timerEx( zclLight_TaskID, LEVEL_PROCESS_EVT);
-    zclLevel_LevelRemainingTime = 0;
+    zclSampleLight_LevelRemainingTime = 0;
     // align variables
-    zclLevel_CurrentLevel_256 = ((int32)zclLevel_CurrentLevel)<<8;
+    zclLevel_CurrentLevel_256 = ((int32)zclSampleLight_LevelCurrentLevel)<<8;
 }
 
 #endif //ZCL_LEVEL_CTRL

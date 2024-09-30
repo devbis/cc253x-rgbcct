@@ -3490,9 +3490,6 @@
     <group>
         <name>App</name>
         <file>
-            <name>$PROJ_DIR$\..\Source\hueToXyTable.c</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\Source\hw_light_ctrl.c</name>
         </file>
         <file>
@@ -3508,6 +3505,12 @@
             <name>$PROJ_DIR$\..\Source\zcl_color_ctrl.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\Source\zcl_level_ctrl.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Source\zcl_level_ctrl.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\Source\zcl_rgblight.c</name>
         </file>
         <file>
@@ -3515,12 +3518,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\Source\zcl_rgblight_data.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\Source\zcl_sampleapps_ui.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\Source\zcl_sampleapps_ui.h</name>
         </file>
     </group>
     <group>
@@ -4073,6 +4070,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Source\zcl_ha.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_lighting.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_lighting.h</name>
         </file>
     </group>
     <group>

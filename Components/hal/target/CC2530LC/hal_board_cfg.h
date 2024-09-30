@@ -279,17 +279,17 @@ extern void MAC_RfFrontendSetup(void);
 #define HAL_PUSH_BUTTON6()        (0)
 
 /* ----------- LED's ---------- */
-#if defined (PWM_ALT2)
-
-#define GREEN_LED HAL_T1_CH2
-#define RED_LED   HAL_T1_CH1
-#define BLUE_LED  HAL_T1_CH4 //Not connected on SmartRF05
-#define WHITE_LED HAL_T1_CH4
-#define ENABLE_LAMP   P1SEL |= ( 0x1 | 0x2 );
-
-#define DISABLE_LAMP  P1SEL &= ~( 0x1 | 0x2 );\
-                      P1    &= ~( 0x1 | 0x2 ); /* P0.3:6 */
-#else
+//#if defined (PWM_ALT2)
+//
+//#define GREEN_LED HAL_T1_CH2
+//#define RED_LED   HAL_T1_CH1
+//#define BLUE_LED  HAL_T1_CH4 //Not connected on SmartRF05
+//#define WHITE_LED HAL_T1_CH4
+//#define ENABLE_LAMP   P1SEL |= ( 0x1 | 0x2 );
+//
+//#define DISABLE_LAMP  P1SEL &= ~( 0x1 | 0x2 );\
+//                      P1    &= ~( 0x1 | 0x2 ); /* P0.3:6 */
+//#else
 #define GREEN_LED HAL_T1_CH3
 #define RED_LED   HAL_T1_CH1
 #define BLUE_LED  HAL_T1_CH2
@@ -298,7 +298,7 @@ extern void MAC_RfFrontendSetup(void);
 
 #define DISABLE_LAMP  P0SEL &= ~( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */\
                       P0    &= ~( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */
-#endif
+//#endif
 
 #define HAL_TURN_OFF_LED1()
 #define HAL_TURN_OFF_LED2()

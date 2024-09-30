@@ -132,6 +132,13 @@ uint16 zclSampleLight_LevelOffTransitionTime;
 uint8  zclSampleLight_LevelDefaultMoveRate;
 #endif
 
+// Scenes
+uint8        zclSampleLight_ScenesSceneCount;
+uint8        zclSampleLight_ScenesCurrentScene;
+uint16       zclSampleLight_ScenesCurrentGroup;
+uint8        zclSampleLight_ScenesSceneValid;
+CONST uint8  zclSampleLight_ScenesNameSupport;
+
 // Color control Cluster (server) -----------------------------------------------------
 #ifdef ZCL_COLOR_CTRL
 uint16 zclColor_CurrentX = 0x616b;
