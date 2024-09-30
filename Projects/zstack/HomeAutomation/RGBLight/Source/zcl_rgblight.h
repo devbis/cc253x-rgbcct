@@ -59,7 +59,7 @@ extern "C"
 /*********************************************************************
  * CONSTANTS
  */
-#define SAMPLELIGHT_ENDPOINT            8
+#define RGBLIGHT_ENDPOINT            8
 
 #define SAMPLELIGHT_NUM_GRPS            2 // Needed to include ZLL Target functionality
 
@@ -139,7 +139,7 @@ extern uint8  zclSampleLight_LevelDefaultMoveRate;
  /*
   * Initialization for the task
   */
-extern void zclSampleLight_Init( byte task_id );
+extern void zclRGBLight_Init( byte task_id );
 
 /*
  *  Event Process for the task

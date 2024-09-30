@@ -174,7 +174,7 @@ void osalInitTasks( void )
   #endif
   zcl_Init( taskID++ );
   bdb_Init( taskID++ );
-  zclSampleLight_Init( taskID );
+  zclRGBLight_Init( taskID );
 }
 
 /*********************************************************************

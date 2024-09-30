@@ -317,7 +317,6 @@
                     <state>xMT_ZDO_FUNC</state>
                     <state>xMT_ZDO_MGMT</state>
                     <state>xMT_APP_CNF_FUNC</state>
-                    <state>LCD_SUPPORTED=DEBUG</state>
                     <state>MULTICAST_ENABLED=FALSE</state>
                     <state>ZCL_READ</state>
                     <state>ZCL_DISCOVER</state>
@@ -328,6 +327,7 @@
                     <state>ZCL_SCENES</state>
                     <state>ZCL_GROUPS</state>
                     <state>ZCL_LEVEL_CTRL</state>
+                    <state>ZCL_COLOR_CTRL</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -795,7 +795,7 @@
                 </option>
                 <option>
                     <name>OutputFile</name>
-                    <state>SampleLight.a51</state>
+                    <state>RGBLight.a51</state>
                 </option>
                 <option>
                     <name>OutputFormat</name>
@@ -993,7 +993,7 @@
                 </option>
                 <option>
                     <name>ExtraOutputFile</name>
-                    <state>SampleLight.sim</state>
+                    <state>RGBLight.sim</state>
                 </option>
                 <option>
                     <name>ExtraOutputFormat</name>
@@ -1478,7 +1478,6 @@
                     <state>xMT_ZDO_FUNC</state>
                     <state>xMT_ZDO_MGMT</state>
                     <state>xMT_APP_CNF_FUNC</state>
-                    <state>LCD_SUPPORTED=DEBUG</state>
                     <state>MULTICAST_ENABLED=FALSE</state>
                     <state>ZCL_READ</state>
                     <state>ZCL_DISCOVER</state>
@@ -1489,6 +1488,7 @@
                     <state>ZCL_SCENES</state>
                     <state>ZCL_GROUPS</state>
                     <state>ZCL_LEVEL_CTRL</state>
+                    <state>ZCL_COLOR_CTRL</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1957,7 +1957,7 @@
                 </option>
                 <option>
                     <name>OutputFile</name>
-                    <state>SampleLight.hex</state>
+                    <state>RGBLight.hex</state>
                 </option>
                 <option>
                     <name>OutputFormat</name>
@@ -2155,7 +2155,7 @@
                 </option>
                 <option>
                     <name>ExtraOutputFile</name>
-                    <state>SampleLight.sim</state>
+                    <state>RGBLight.sim</state>
                 </option>
                 <option>
                     <name>ExtraOutputFormat</name>
@@ -2642,7 +2642,6 @@
                     <state>xMT_ZDO_FUNC</state>
                     <state>xMT_ZDO_MGMT</state>
                     <state>xMT_APP_CNF_FUNC</state>
-                    <state>LCD_SUPPORTED=DEBUG</state>
                     <state>MULTICAST_ENABLED=FALSE</state>
                     <state>ZCL_READ</state>
                     <state>ZCL_DISCOVER</state>
@@ -2653,6 +2652,7 @@
                     <state>ZCL_SCENES</state>
                     <state>ZCL_GROUPS</state>
                     <state>ZCL_LEVEL_CTRL</state>
+                    <state>ZCL_COLOR_CTRL</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -3120,7 +3120,7 @@
                 </option>
                 <option>
                     <name>OutputFile</name>
-                    <state>SampleLight.d51</state>
+                    <state>RGBLight.d51</state>
                 </option>
                 <option>
                     <name>OutputFormat</name>
@@ -3318,7 +3318,7 @@
                 </option>
                 <option>
                     <name>ExtraOutputFile</name>
-                    <state>SampleLight.sim</state>
+                    <state>RGBLight.sim</state>
                 </option>
                 <option>
                     <name>ExtraOutputFormat</name>
@@ -3490,13 +3490,22 @@
     <group>
         <name>App</name>
         <file>
-            <name>$PROJ_DIR$\..\Source\OSAL_SampleLight.c</name>
+            <name>$PROJ_DIR$\..\Source\hueToXyTable.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\Source\zcl_sampleapps_ui.c</name>
+            <name>$PROJ_DIR$\..\Source\hw_light_ctrl.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\Source\zcl_sampleapps_ui.h</name>
+            <name>$PROJ_DIR$\..\Source\hw_light_ctrl.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Source\OSAL_RGBLight.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Source\zcl_color_ctrl.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Source\zcl_color_ctrl.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\Source\zcl_rgblight.c</name>
@@ -3506,6 +3515,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\Source\zcl_rgblight_data.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Source\zcl_sampleapps_ui.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Source\zcl_sampleapps_ui.h</name>
         </file>
     </group>
     <group>

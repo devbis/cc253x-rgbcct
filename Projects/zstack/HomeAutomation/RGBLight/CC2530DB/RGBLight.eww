@@ -2,26 +2,22 @@
 
 <workspace>
   <project>
-    <path>$WS_DIR$\SampleLight.ewp</path>
+    <path>$WS_DIR$\RGBLight.ewp</path>
   </project>
   <batchBuild>
     <batchDefinition>
       <name>ALL</name>
       <member>
-        <project>SampleLight</project>
+        <project>RGBLight</project>
         <configuration>CoordinatorEB</configuration>
       </member>
       <member>
-        <project>SampleLight</project>
+        <project>RGBLight</project>
         <configuration>RouterEB</configuration>
       </member>
       <member>
-        <project>SampleLight</project>
+        <project>RGBLight</project>
         <configuration>EndDeviceEB</configuration>
-      </member>
-      <member>
-        <project>SampleLight</project>
-        <configuration>RouterZLight</configuration>
       </member>
     </batchDefinition>
   </batchBuild>

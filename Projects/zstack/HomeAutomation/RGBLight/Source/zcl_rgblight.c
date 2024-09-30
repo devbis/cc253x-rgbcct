@@ -124,6 +124,9 @@
 #endif
 
 #include "zcl_sampleapps_ui.h"
+#include "zcl_level_ctrl.h"
+#include "zcl_color_ctrl.h"
+
 
 /*********************************************************************
  * MACROS
@@ -154,7 +157,7 @@ afAddrType_t zclSampleLight_DstAddr;
 // Test Endpoint to allow SYS_APP_MSGs
 static endPointDesc_t sampleLight_TestEp =
 {
-  SAMPLELIGHT_ENDPOINT,
+  RGBLIGHT_ENDPOINT,
   0,
   &zclSampleLight_TaskID,
   (SimpleDescriptionFormat_t *)NULL,  // No Simple description for this test endpoint
@@ -253,7 +256,7 @@ extern int16 zdpExternalStateTaskID;
 /*********************************************************************
  * ZCL General Profile Callback table
  */
-static zclGeneral_AppCallbacks_t zclSampleLight_CmdCallbacks =
+static zclGeneral_AppCallbacks_t zclGeneral_CmdCallbacks =
 {
   zclSampleLight_BasicResetCB,            // Basic Cluster Reset command
   NULL,                                   // Identify Trigger Effect command
@@ -287,7 +290,35 @@ static zclGeneral_AppCallbacks_t zclSampleLight_CmdCallbacks =
 };
 
 /*********************************************************************
- * @fn          zclSampleLight_Init
+ * ZCL Lighting Profile Callback table
+ */
+#ifdef ZCL_COLOR_CTRL
+
+static zclLighting_AppCallbacks_t zclLighting_CmdCallbacks =
+{
+  zclColor_MoveToHueCB,   //Move To Hue Command
+  zclColor_MoveHueCB,   //Move Hue Command
+  zclColor_StepHueCB,   //Step Hue Command
+  zclColor_MoveToSaturationCB,   //Move To Saturation Command
+  zclColor_MoveSaturationCB,   //Move Saturation Command
+  zclColor_StepSaturationCB,   //Step Saturation Command
+  zclColor_MoveToHueAndSaturationCB,   //Move To Hue And Saturation  Command
+  zclColor_MoveToColorCB, // Move To Color Command
+  zclColor_MoveColorCB,   // Move Color Command
+  zclColor_StepColorCB,   // STEP To Color Command
+  NULL,                                     // Move To Color Temperature Command
+  zclColor_EnhMoveToHueCB,// Enhanced Move To Hue
+  zclColor_MoveEnhHueCB,  // Enhanced Move Hue;
+  zclColor_StepEnhHueCB,  // Enhanced Step Hue;
+  zclColor_MoveToEnhHueAndSaturationCB, // Enhanced Move To Hue And Saturation;
+  zclColor_SetColorLoopCB, // Color Loop Set Command
+  zclColor_StopCB,        // Stop Move Step;
+};
+#endif /* ZCL_COLOR_CTRL */
+
+
+/*********************************************************************
+ * @fn          zclRGBLight_Init
  *
  * @brief       Initialization function for the zclGeneral layer.
  *
@@ -295,7 +326,7 @@ static zclGeneral_AppCallbacks_t zclSampleLight_CmdCallbacks =
  *
  * @return      none
  */
-void zclSampleLight_Init( byte task_id )
+void zclRGBLight_Init( byte task_id )
 {
   zclSampleLight_TaskID = task_id;
 
@@ -308,22 +339,28 @@ void zclSampleLight_Init( byte task_id )
   bdb_RegisterSimpleDescriptor( &zclSampleLight_SimpleDesc );
 
   // Register the ZCL General Cluster Library callback functions
-  zclGeneral_RegisterCmdCallbacks( SAMPLELIGHT_ENDPOINT, &zclSampleLight_CmdCallbacks );
+  zclGeneral_RegisterCmdCallbacks( RGBLIGHT_ENDPOINT, &zclGeneral_CmdCallbacks );
 
   // Register the application's attribute list
   zclSampleLight_ResetAttributesToDefaultValues();
-  zcl_registerAttrList( SAMPLELIGHT_ENDPOINT, zclSampleLight_NumAttributes, zclSampleLight_Attrs );
+  zcl_registerAttrList( RGBLIGHT_ENDPOINT, zclSampleLight_NumAttributes, zclSampleLight_Attrs );
 
 #ifdef ZCL_LEVEL_CTRL
   zclSampleLight_LevelLastLevel = zclSampleLight_LevelCurrentLevel;
 #endif
+
+#ifdef ZCL_COLOR_CTRL
+  // Register the ZCL Lighting Cluster Library callback functions
+  zclLighting_RegisterCmdCallbacks( RGBLIGHT_ENDPOINT, &zclLighting_CmdCallbacks );
+  zclColor_init(zclSampleLight_TaskID);
+#endif //#ifdef ZCL_COLOR_CTRL
 
   // Register the Application to receive the unprocessed Foundation command/response messages
   zcl_registerForMsg( zclSampleLight_TaskID );
 
 #ifdef ZCL_DISCOVER
   // Register the application's command list
-  zcl_registerCmdList( SAMPLELIGHT_ENDPOINT, zclCmdsArraySize, zclSampleLight_Cmds );
+  zcl_registerCmdList( RGBLIGHT_ENDPOINT, zclCmdsArraySize, zclSampleLight_Cmds );
 #endif
 
   // Register low voltage NV memory protection application callback
@@ -340,7 +377,7 @@ void zclSampleLight_Init( byte task_id )
 #ifdef ZCL_DIAGNOSTIC
   // Register the application's callback function to read/write attribute data.
   // This is only required when the attribute data format is unknown to ZCL.
-  zcl_registerReadWriteCB( SAMPLELIGHT_ENDPOINT, zclDiagnostic_ReadWriteAttrCB, NULL );
+  zcl_registerReadWriteCB( RGBLIGHT_ENDPOINT, zclDiagnostic_ReadWriteAttrCB, NULL );
 
   if ( zclDiagnostic_InitStats() == ZSuccess )
   {

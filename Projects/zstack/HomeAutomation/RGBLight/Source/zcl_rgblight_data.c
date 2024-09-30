@@ -61,6 +61,7 @@
 #include "zcl_hvac.h"
 
 #include "zcl_rgblight.h"
+#include "zcl_lighting.h"
 
 /*********************************************************************
  * CONSTANTS
@@ -102,9 +103,9 @@ const uint16 zclSampleLight_clusterRevision_all = 0x0001; //currently all cluste
 // Basic Cluster
 const uint8 zclSampleLight_HWRevision = SAMPLELIGHT_HWVERSION;
 const uint8 zclSampleLight_ZCLVersion = SAMPLELIGHT_ZCLVERSION;
-const uint8 zclSampleLight_ManufacturerName[] = { 16, 'L','i','f','e','C','o','n','t','r','o','l','','','','','' };
-const uint8 zclSampleLight_ModelId[] = { 16, 'B','U','L','B','','',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ' };
-const uint8 zclSampleLight_DateCode[] = { 16, '2','0','2','4','0','9','3','1',' ',' ',' ',' ',' ',' ',' ',' ' };
+const uint8 zclSampleLight_ManufacturerName[] = { 11, 'L','i','f','e','C','o','n','t','r','o','l' };
+const uint8 zclSampleLight_ModelId[] = { 4, 'B','U','L','B' };
+const uint8 zclSampleLight_DateCode[] = { 8, '2','0','2','4','0','9','3','1' };
 const uint8 zclSampleLight_PowerSource = POWER_SOURCE_MAINS_1_PHASE;
 
 uint8 zclSampleLight_LocationDescription[17];
@@ -130,6 +131,45 @@ uint16 zclSampleLight_LevelOnTransitionTime;
 uint16 zclSampleLight_LevelOffTransitionTime;
 uint8  zclSampleLight_LevelDefaultMoveRate;
 #endif
+
+// Color control Cluster (server) -----------------------------------------------------
+#ifdef ZCL_COLOR_CTRL
+uint16 zclColor_CurrentX = 0x616b;
+uint16 zclColor_CurrentY = 0x607d;
+uint16 zclColor_EnhancedCurrentHue = 0;
+uint8  zclColor_CurrentHue = 0;
+uint8  zclColor_CurrentSaturation = 0x0;
+
+uint8  zclColor_ColorMode = COLOR_MODE_CURRENT_X_Y;
+uint8  zclColor_EnhancedColorMode = ENHANCED_COLOR_MODE_CURRENT_HUE_SATURATION;
+uint16 zclColor_ColorRemainingTime = 0;
+uint8  zclColor_ColorLoopActive = 0;
+uint8  zclColor_ColorLoopDirection = 0;
+uint16 zclColor_ColorLoopTime = 0x0019;
+uint16 zclColor_ColorLoopStartEnhancedHue = 0x2300;
+uint16 zclColor_ColorLoopStoredEnhancedHue = 0;
+uint16 zclColor_ColorCapabilities = ( COLOR_CAPABILITIES_ATTR_BIT_HUE_SATURATION |
+                                      COLOR_CAPABILITIES_ATTR_BIT_ENHANCED_HUE |
+                                      COLOR_CAPABILITIES_ATTR_BIT_COLOR_LOOP |
+                                      COLOR_CAPABILITIES_ATTR_BIT_X_Y_ATTRIBUTES );
+#ifdef ZLL_HW_LED_LAMP
+const uint8  zclColor_NumOfPrimaries = 3;
+//RED: LR W5AP, 625nm
+const uint16 zclColor_Primary1X = 0xB35B;
+const uint16 zclColor_Primary1Y = 0x4C9F;
+const uint8 zclColor_Primary1Intensity = 0x9F;
+//GREEN: LT W5AP, 528nm
+const uint16 zclColor_Primary2X = 0x2382;
+const uint16 zclColor_Primary2Y = 0xD095;
+const uint8 zclColor_Primary2Intensity = 0xF0;
+//BLUE: LD W5AP, 455nm
+const uint16 zclColor_Primary3X = 0x26A7;
+const uint16 zclColor_Primary3Y = 0x05D2;
+const uint8 zclColor_Primary3Intensity = 0xFE;
+#else
+const uint8  zclColor_NumOfPrimaries = 0;
+#endif //ZLL_HW_LED_LAMP
+#endif //ZCL_COLOR_CTRL
 
 #if ZCL_DISCOVER
 CONST zclCommandRec_t zclSampleLight_Cmds[] =
@@ -417,6 +457,237 @@ CONST zclAttrRec_t zclSampleLight_Attrs[] =
     }
   },
 #endif
+  // *** Color Control Cluster Attributes ***
+#ifdef ZCL_COLOR_CTRL
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_CURRENT_SATURATION,
+      ZCL_DATATYPE_UINT8,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_CurrentSaturation
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_CURRENT_HUE,
+      ZCL_DATATYPE_UINT8,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_CurrentHue
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_REMAINING_TIME,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_ColorRemainingTime
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_CURRENT_X,
+      ZCL_DATATYPE_UINT16,
+      (ACCESS_CONTROL_READ),
+      (void *)&zclColor_CurrentX
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_CURRENT_Y,
+      ZCL_DATATYPE_UINT16,
+      (ACCESS_CONTROL_READ),
+      (void *)&zclColor_CurrentY
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_COLOR_MODE,
+      ZCL_DATATYPE_ENUM8,
+      (ACCESS_CONTROL_READ),
+      (void *)&zclColor_ColorMode
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_NUM_PRIMARIES,
+      ZCL_DATATYPE_UINT8,
+      (ACCESS_CONTROL_READ),
+      (void *)&zclColor_NumOfPrimaries
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_ENHANCED_COLOR_MODE,
+      ZCL_DATATYPE_ENUM8,
+      (ACCESS_CONTROL_READ),
+      (void *)&zclColor_EnhancedColorMode
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_ENHANCED_CURRENT_HUE,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_EnhancedCurrentHue
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_COLOR_LOOP_ACTIVE,
+      ZCL_DATATYPE_UINT8,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_ColorLoopActive
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_COLOR_LOOP_DIRECTION,
+      ZCL_DATATYPE_UINT8,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_ColorLoopDirection
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_COLOR_LOOP_TIME,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_ColorLoopTime
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_ColorLoopStartEnhancedHue
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_ColorLoopStoredEnhancedHue
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_COLOR_CAPABILITIES,
+      ZCL_DATATYPE_BITMAP16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_ColorCapabilities
+    }
+  },
+#ifdef ZLL_HW_LED_LAMP
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_1_X,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary1X
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_1_Y,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary1Y
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_1_INTENSITY,
+      ZCL_DATATYPE_UINT8,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary1Intensity
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_2_X,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary2X
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_2_Y,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary2Y
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_2_INTENSITY,
+      ZCL_DATATYPE_UINT8,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary2Intensity
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_3_X,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary3X
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_3_Y,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary3Y
+    }
+  },
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    { // Attribute record
+      ATTRID_LIGHTING_COLOR_CONTROL_PRIMARY_3_INTENSITY,
+      ZCL_DATATYPE_UINT8,
+      ACCESS_CONTROL_READ,
+      (void *)&zclColor_Primary3Intensity
+    }
+  },
+#endif //ZLL_HW_LED_LAMP
+  {
+    ZCL_CLUSTER_ID_LIGHTING_COLOR_CONTROL,
+    {  // Attribute record
+      ATTRID_CLUSTER_REVISION,
+      ZCL_DATATYPE_UINT16,
+      ACCESS_CONTROL_READ,
+      (void *)&zclSampleLight_clusterRevision_all
+    }
+  },
+#endif //ZCL_COLOR_CTRL
+
 #ifdef ZCL_GROUPS
   {
     ZCL_CLUSTER_ID_GEN_GROUPS,
@@ -776,7 +1047,7 @@ const cId_t zclSampleLight_InClusterList[] =
 
 SimpleDescriptionFormat_t zclSampleLight_SimpleDesc =
 {
-  SAMPLELIGHT_ENDPOINT,                  //  int Endpoint;
+  RGBLIGHT_ENDPOINT,                  //  int Endpoint;
   ZCL_HA_PROFILE_ID,                     //  uint16 AppProfId;
 #ifdef ZCL_LEVEL_CTRL
   ZCL_HA_DEVICEID_DIMMABLE_LIGHT,        //  uint16 AppDeviceId;
@@ -795,7 +1066,7 @@ SimpleDescriptionFormat_t zclSampleLight_SimpleDesc =
 #if defined ( BDB_TL_INITIATOR ) || defined ( BDB_TL_TARGET )
 bdbTLDeviceInfo_t tlSampleLight_DeviceInfo =
 {
-  SAMPLELIGHT_ENDPOINT,                  //uint8 endpoint;
+  RGBLIGHT_ENDPOINT,                  //uint8 endpoint;
   ZCL_HA_PROFILE_ID,                        //uint16 profileID;
 #ifdef ZCL_LEVEL_CTRL
       ZCL_HA_DEVICEID_DIMMABLE_LIGHT,        //  uint16 AppDeviceId;
