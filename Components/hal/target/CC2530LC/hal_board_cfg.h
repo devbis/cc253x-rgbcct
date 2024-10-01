@@ -75,6 +75,9 @@
 #define HAL_BOARD_CC2530EB_REV17
 #endif
 
+#define HAL_T3_CH0 1
+#define HAL_T3_CH1 1
+
 /* ------------------------------------------------------------------------------------------------
  *                                          Clock Speed
  * ------------------------------------------------------------------------------------------------
@@ -290,10 +293,11 @@ extern void MAC_RfFrontendSetup(void);
 //#define DISABLE_LAMP  P1SEL &= ~( 0x1 | 0x2 );\
 //                      P1    &= ~( 0x1 | 0x2 ); /* P0.3:6 */
 //#else
-#define GREEN_LED HAL_T1_CH3
-#define RED_LED   HAL_T1_CH1
-#define BLUE_LED  HAL_T1_CH2
-#define WHITE_LED HAL_T1_CH4
+#define WARM_WHITE_LED HAL_T1_CH4
+#define RED_LED        HAL_T1_CH1
+#define BLUE_LED       HAL_T1_CH2
+#define GREEN_LED      HAL_T1_CH3
+#define COLD_WHITE_LED HAL_T3_CH1
 #define ENABLE_LAMP   P0SEL |= ( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */\
 
 #define DISABLE_LAMP  P0SEL &= ~( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */\
@@ -478,21 +482,25 @@ st( \
 /*******************************************************************************************************
 */
 
-#if defined (PWM_ALT2)
+//#if defined (PWM_ALT2)
+//#define INIT_PWM_PINS()                                          \
+//{                                                                \
+//  /* Drive LED1 from timer 1 ch2 and LED2 from timer 1 ch1 */    \
+//  /* unfortunitly we can not connect any other leds to the timer PWM */ \
+//  /* on the SmartRF05EB/BB */                                    \
+//  PERCFG |= 0x40; /* set timer 1 to use alt configuration*/      \
+//  P1SEL |= ( 0x1 | 0x2 );                                        \
+//  P1DIR |= ( 0x1 | 0x2 );                                        \
+//}
+//#else
 #define INIT_PWM_PINS()                                          \
 {                                                                \
-  /* Drive LED1 from timer 1 ch2 and LED2 from timer 1 ch1 */    \
-  /* unfortunitly we can not connect any other leds to the timer PWM */ \
-  /* on the SmartRF05EB/BB */                                    \
-  PERCFG |= 0x40; /* set timer 1 to use alt configuration*/      \
-  P1SEL |= ( 0x1 | 0x2 );                                        \
-  P1DIR |= ( 0x1 | 0x2 );                                        \
-}
-#else
-#define INIT_PWM_PINS()                                          \
-{                                                                \
-  PERCFG &= ~(0x40); /* bit 6 = 0 */                             \
+  PERCFG &= ~(0x40 | 0x20); /* bit 6 = 0 */                             \
   P0SEL |= ( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */            \
   P0DIR |= ( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */            \
+  /*PERCFG &= ~0x20; //select of alternative 1 for timer 3 */    \
+  P2SEL |= 0x20; /* Timer 3 priority over USART1 */              \
+  P1SEL |= 0xC0; /*P1.6、P1.7*/                                  \
+  P1DIR |= 0xC0; /*P1.6、P1.7*/                                  \
 }
-#endif
+//#endif

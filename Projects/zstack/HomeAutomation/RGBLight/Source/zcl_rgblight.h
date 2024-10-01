@@ -56,6 +56,8 @@ extern "C"
   #include "zcl_general.h"
   #include "bdb_tlCommissioning.h"
 #endif
+#include  "hal_timer.h"
+
 /*********************************************************************
  * CONSTANTS
  */
@@ -93,6 +95,9 @@ extern "C"
 /*********************************************************************
  * VARIABLES
  */
+
+void HalTimer3Init (halTimerCBack_t cBack);
+
 
 // Added to include ZLL Target functionality
 #if defined ( BDB_TL_INITIATOR ) || defined ( BDB_TL_TARGET )

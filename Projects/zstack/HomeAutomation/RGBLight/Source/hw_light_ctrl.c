@@ -93,6 +93,7 @@
 /*********************************************************************
  * GLOBAL FUNCTIONS
  */
+void halTimer3SetChannelDuty (uint8 channel, uint16 promill);
 
 /*********************************************************************
  * LOCAL VARIABLES
@@ -144,8 +145,8 @@ static void hwLight_UpdateLampColor( uint16 colorX, uint16 colorY, uint8 level)
   halTimer1SetChannelDuty (RED_LED,   redP);
   halTimer1SetChannelDuty (GREEN_LED, greenP);
   halTimer1SetChannelDuty (BLUE_LED,  blueP);
-  halTimer1SetChannelDuty (WHITE_LED, whiteP);
-
+  halTimer1SetChannelDuty (WARM_WHITE_LED, whiteP);
+  halTimer3SetChannelDuty (COLD_WHITE_LED, whiteP);
 }
 
 /*********************************************************************

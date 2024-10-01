@@ -22,7 +22,7 @@
   its documentation for any purpose.
 
   YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
-  PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+  PROVIDED ï¿½AS ISï¿½ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
   INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
   NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
   TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -210,8 +210,10 @@ typedef struct
 static halTimerSettings_t halTimerRecord[HW_TIMER_MAX];
 static halTimerChannel_t  halTimerChannel[HAL_TIMER_CH_MAX];
 static halTimer1Channel_t  halTimer1Channel[HAL_TIMER_CH_MAX];
+static halTimer1Channel_t  halTimer3Channel[HAL_TIMER_CH_MAX];
 
 static uint16 Timer1MaxCount;
+static uint16 Timer3MaxCount = 255;
 
 /*********************************************************************
  * FUNCTIONS - External
@@ -234,6 +236,10 @@ uint16 halTimer1SetPeriod (uint32 timePerTick);
 void halTimer1SetChannelCount (uint8 channel, uint16 count);
 uint8 halTimer1SetChannelCCTL (uint8 channel, uint8 rfirq,  uint8 im,  uint8 cmp,  uint8 mode,  uint8 cap );
 
+void HalTimer3Init (halTimerCBack_t cBack);
+void halTimer3SetChannelDuty (uint8 channel, uint16 promill);
+uint8 halTimer3SetPeriod (uint32 timePerTick);
+void halTimer3SetChannelCount (uint8 channel, uint8 count);
 
 /*********************************************************************
  * FUNCTIONS - API
@@ -280,7 +286,7 @@ void HalTimer1Init (halTimerCBack_t cBack)
   halTimer1SetChannelCCTL(HAL_T1_CH2, 0, 1, HAL_TIMER1_CHn_CMP_MODE_CLR_ON_COMP_SET_ON_0, 1, HAL_TIMER1_CH_CAP_MODE_NO);
   halTimer1SetChannelCCTL(HAL_T1_CH3, 0, 1, HAL_TIMER1_CHn_CMP_MODE_CLR_ON_COMP_SET_ON_0, 1, HAL_TIMER1_CH_CAP_MODE_NO);
   halTimer1SetChannelCCTL(HAL_T1_CH4, 0, 1, HAL_TIMER1_CHn_CMP_MODE_CLR_ON_COMP_SET_ON_0, 1, HAL_TIMER1_CH_CAP_MODE_NO);
-  
+
   halTimer1SetChannelDuty (HAL_T1_CH1, 0);
   halTimer1SetChannelDuty (HAL_T1_CH2, 0);
   halTimer1SetChannelDuty (HAL_T1_CH3, 0);
@@ -298,7 +304,7 @@ void HalTimer1Init (halTimerCBack_t cBack)
  *
  * @brief   Set period for Timer1 PWM
  *
- * @param   
+ * @param
  *          timerPerTick - Number micro sec per ticks
  *
  * @return  Status - OK or Not OK
@@ -313,6 +319,15 @@ uint16 halTimer1SetPeriod (uint32 timePerTick)
   return count;
 }
 
+uint8 halTimer3SetPeriod (uint32 timePerTick)
+{
+  uint8  count;
+
+  /* Load count = ((sec/tick) x clock) / prescale */
+  count = (uint8)((timePerTick * halTimerRecord[HW_TIMER_3].clock) / halTimerRecord[HW_TIMER_3].prescaleVal)/2;
+  halTimer3SetChannelCount(HAL_T3_CH0, count);
+  return count;
+}
 
 /***************************************************************************************************
  * @fn      halTimer1SetChannelDuty
@@ -328,15 +343,30 @@ void halTimer1SetChannelDuty (uint8 channel, uint16 promill)
 {
 #define MIN_PROMILL 20
   uint16  count;
-  
+
   if (promill < MIN_PROMILL)
     promill = 0;
-  
+
   /* Load count = ((sec/tick) x clock) / prescale */
   count = (uint16)( ((uint32)(Timer1MaxCount) * promill + 500)/ 1000 );
-  count = ( (count >= Timer1MaxCount) ? Timer1MaxCount-1 : (count == 0 ? 1 : count) ); 
-  
+  count = ( (count >= Timer1MaxCount) ? Timer1MaxCount-1 : (count == 0 ? 1 : count) );
+
   halTimer1SetChannelCount(channel, count);
+}
+
+void halTimer3SetChannelDuty (uint8 channel, uint16 promill)
+{
+#define MIN_PROMILL 20
+  uint16  count;
+
+  if (promill < MIN_PROMILL)
+    promill = 0;
+
+  /* Load count = ((sec/tick) x clock) / prescale */
+  count = (uint16)( ((uint32)(Timer3MaxCount) * promill + 500)/ 1000 );
+  count = ( (count >= Timer3MaxCount) ? Timer3MaxCount : (count == 0 ? 1 : count) );
+
+  halTimer3SetChannelCount(channel, (uint8) count);
 }
 
 /***************************************************************************************************
@@ -360,6 +390,11 @@ void halTimer1SetChannelCount (uint8 channel, uint16 count)
   *(halTimer1Channel[0].TxCCL + 2*channel) = low;
 }
 
+void halTimer3SetChannelCount (uint8 channel, uint8 count)
+{
+  *(halTimer3Channel[0].TxCCL + 2*channel) = count;
+}
+
 /***************************************************************************************************
  * @fn      halTimerSetChannelMode
  *
@@ -375,22 +410,56 @@ void halTimer1SetChannelCount (uint8 channel, uint16 count)
 uint8 halTimer1SetChannelCCTL (uint8 channel, uint8 rfirq,  uint8 im,  uint8 cmp,  uint8 mode,  uint8 cap )
 {
   *(halTimer1Channel[0].TxCCTL + channel) = 0;
-  
+
   if (rfirq)
     *(halTimer1Channel[0].TxCCTL + channel) |= T1CCTL_RFIRQ;
 
   if (im)
     *(halTimer1Channel[0].TxCCTL + channel) |= T134CCTL_IM;
-  
+
   if (mode)
     *(halTimer1Channel[0].TxCCTL + channel) |= T134CCTL_MODE;
 
   *(halTimer1Channel[0].TxCCTL + channel) |= (cmp << 3);
-  
-  
-    *(halTimer1Channel[0].TxCCTL + channel) |= cap;
+  *(halTimer1Channel[0].TxCCTL + channel) |= cap;
 
   return HAL_TIMER_OK;
+}
+
+void HalTimer3Init (halTimerCBack_t cBack)
+{
+  T3CCTL0 = 0;    /* Make sure interrupts are disabled */
+  T3CCTL1 = 0;    /* Make sure interrupts are disabled */
+
+  /* Setup prescale & clock for timer0 */
+  halTimerRecord[HW_TIMER_3].prescale    = HAL_TIMER3_8_PRESCALE;
+  halTimerRecord[HW_TIMER_3].clock       = HAL_TIMER_32MHZ;
+  halTimerRecord[HW_TIMER_3].prescaleVal = HAL_TIMER3_8_PRESCALE_VAL;
+
+  /* Setup Timer3 Channel structure */
+  halTimer3Channel[0].TxCCTL =  TCHN_T3CCTL;
+  halTimer3Channel[0].TxCCL =   TCHN_T3CCL;
+  halTimer3Channel[0].TxCCH =   TCHN_T3CCH;
+
+  halTimerRecord[HW_TIMER_3].configured    = TRUE;
+  halTimerRecord[HW_TIMER_3].opMode        = HAL_TIMER34_OPMODE_MODULO;
+  halTimerRecord[HW_TIMER_3].channel       = 0;
+  halTimerRecord[HW_TIMER_3].channelMode   = 0;
+  halTimerRecord[HW_TIMER_3].intEnable     = FALSE;
+  halTimerRecord[HW_TIMER_3].callBackFunc  = cBack;
+//  Timer3MaxCount = halTimer3SetPeriod (4292); // 233Hz
+
+  halTimerSetPrescale (HW_TIMER_3, halTimerRecord[HW_TIMER_3].prescale);
+  halTimerSetChannelMode (HW_TIMER_3, halTimerRecord[HW_TIMER_3].channelMode);
+  halTimer1SetChannelCCTL(HAL_T3_CH0, 0, 1, HAL_TIMER1_CHn_CMP_MODE_CLR_ON_COMP_SET_ON_0, 1, HAL_TIMER1_CH_CAP_MODE_NO);
+  halTimer1SetChannelCCTL(HAL_T3_CH1, 0, 1, HAL_TIMER1_CHn_CMP_MODE_CLR_ON_COMP_SET_ON_0, 1, HAL_TIMER1_CH_CAP_MODE_NO);
+
+  halTimer1SetChannelDuty (HAL_T3_CH0, 0);
+  halTimer1SetChannelDuty (HAL_T3_CH1, 0);
+
+  /* set timer 1 operating mode */
+  T3CTL &= ~(HAL_TIMER34_OPMODE_BITS);
+  T3CTL |= HAL_TIMER34_OPMODE_MODULO;
 }
 
 /*********************************************************************

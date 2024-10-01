@@ -344,6 +344,7 @@ void zclRGBLight_Init( byte task_id )
 
 #ifdef ZLL_HW_LED_LAMP
   HalTimer1Init(0);
+  HalTimer3Init(0);
 #endif //ZLL_HW_LED_LAMP
 
   // Register the application's attribute list
@@ -357,7 +358,7 @@ void zclRGBLight_Init( byte task_id )
   zclLevel_init(zclSampleLight_TaskID, zclSampleLight_OnOffCB);
 #else
   #ifdef ZLL_HW_LED_LAMP
-    halTimer1SetChannelDuty (WHITE_LED, PWM_FULL_DUTY_CYCLE); //initialize on/off LED to full power
+    halTimer1SetChannelDuty (WARM_WHITE_LED, PWM_FULL_DUTY_CYCLE); //initialize on/off LED to full power
   #endif
 #endif //ZCL_LEVEL_CTRL
 
