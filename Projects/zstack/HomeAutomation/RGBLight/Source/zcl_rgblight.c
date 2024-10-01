@@ -506,7 +506,8 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
  */
 static void zclSampleLight_HandleKeys( byte shift, byte keys )
 {
-//  UI_MainStateMachine(keys);
+  // zclFactoryResetter_HandleKeys(shift, keys);
+  // UI_MainStateMachine(keys);
 }
 
 //GP_UPDATE

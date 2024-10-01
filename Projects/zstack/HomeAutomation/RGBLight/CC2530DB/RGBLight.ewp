@@ -3490,6 +3490,12 @@
     <group>
         <name>App</name>
         <file>
+            <name>$PROJ_DIR$\..\Source\factory_reset.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Source\factory_reset.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\Source\hw_light_ctrl.c</name>
         </file>
         <file>

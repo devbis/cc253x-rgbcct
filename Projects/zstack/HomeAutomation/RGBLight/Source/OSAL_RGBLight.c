@@ -79,6 +79,7 @@
 #endif // INTER_PAN
 
 #include "zcl_rgblight.h"
+#include "factory_reset.h"
 
 /*********************************************************************
  * GLOBAL VARIABLES
@@ -117,7 +118,8 @@ const pTaskEventHandlerFn tasksArr[] = {
   #endif
   zcl_event_loop,
   bdb_event_loop,
-  zclSampleLight_event_loop
+  zclSampleLight_event_loop,
+  zclFactoryResetter_loop
 };
 
 const uint8 tasksCnt = sizeof( tasksArr ) / sizeof( tasksArr[0] );
@@ -174,6 +176,7 @@ void osalInitTasks( void )
   #endif
   zcl_Init( taskID++ );
   bdb_Init( taskID++ );
+  zclFactoryResetter_Init(taskID++);
   zclRGBLight_Init( taskID );
 }
 
