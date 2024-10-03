@@ -1,0 +1,8 @@
+.idea
+.vscode
+**/Exe
+**/List
+**/Obj
+**/*.hex
+**/*.dep
+**/settings
