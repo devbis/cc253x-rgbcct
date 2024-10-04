@@ -344,7 +344,7 @@ void zclRGBLight_Init( byte task_id )
 
 #ifdef ZLL_HW_LED_LAMP
   HalTimer1Init(0);
-  HalTimer3Init(0);
+//  HalTimer3Init(0);
 #endif //ZLL_HW_LED_LAMP
 
   // Register the application's attribute list
