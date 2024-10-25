@@ -1,0 +1,157 @@
+name: Build IAR 8051
+
+on:
+  deployment:
+  repository_dispatch:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PROJECT_URL: https://github.com/koptserg/t-monitor.git
+  PROJECT: RGBLight
+  CONFIGURATION: RouterEB
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download extractors
+        run: | 
+         curl -L https://github.com/lifenjoiner/ISx/releases/download/v0.3.8/ISx-v0.3.8-win32.7z -o ISx.7z
+         7z.exe x ISx.7z -oisx
+         curl -L https://github.com/ericchristoffersen/Unshield_MSVC2019/raw/master/Unshield_MSVC2019.exe -o unshield.exe
+        shell: bash
+
+      - name: Download and extract EW8051
+        run: |
+          curl -L http://netstorage.iar.com/SuppDB/Protected/PRODUPD/013455/EW8051-10301-Autorun.exe -o EW8051.exe
+          7z.exe x EW8051.exe -oew8051
+        shell: bash
+
+      - name: Extract setup files
+        run: |
+          ./isx/isx.exe ./ew8051/ew/setup.exe
+          mv ./ew8051/ew/setup_u .
+          ./unshield  -d data1 x ./setup_u/Disk1/data1.cab
+          ./unshield  -d data2 x ./setup_u/Disk1/data2.cab
+        shell: bash
+
+      - name: Merge compiler to single directory
+        run: |
+          mkdir embedded_workbench
+          cat <<EOF> binpatch.py
+          import argparse
+          import shutil
+
+          def patch_file(file_path: str, patches: list):
+              with open(file_path, 'rb+') as f:
+                  for patch in patches:
+                      pos, new_bytes = patch
+                      f.seek(pos)
+                      print(hex(pos), new_bytes.hex(' '))
+                      f.write(new_bytes)
+
+          if __name__ == '__main__':
+              parser = argparse.ArgumentParser(
+                  description='Move merge src into dest. Overwrite existing files.'
+              )
+              parser.add_argument('file_path')
+              parser.add_argument('patch_line', nargs="+",)
+              args = parser.parse_args()
+              patches = []
+              for patch in args.patch_line:
+                  pos, new_bytes = patch.split(':')
+                  pos = int(pos, 16)
+                  new_bytes = bytes.fromhex(new_bytes)
+                  patches.append((pos, new_bytes))
+
+              shutil.copy(args.file_path, args.file_path + '.bak')
+              patch_file(args.file_path, patches)
+          EOF
+          cat <<EOF> merge.py
+          import argparse
+          import os
+          import shutil
+
+          def merge_subdirs(source_root, dest_root):
+              for subdir in os.listdir(source_root):
+                  move_merge_dirs(os.path.join(source_root, subdir), dest_root)
+
+          def move_merge_dirs(source_root, dest_root):
+              for path, dirs, files in os.walk(source_root, topdown=False):
+                  dest_dir = os.path.join(
+                      dest_root,
+                      os.path.relpath(path, source_root)
+                  )
+                  if not os.path.exists(dest_dir):
+                      os.makedirs(dest_dir)
+                  for filename in files:
+                      try: 
+                          os.rename(
+                              os.path.join(path, filename),
+                              os.path.join(dest_dir, filename)
+                          )
+                      except FileExistsError:
+                        pass
+                  for dirname in dirs:
+                      shutil.rmtree(os.path.join(path, dirname))
+
+              shutil.rmtree(source_root)
+
+
+          if __name__ == '__main__':
+              parser = argparse.ArgumentParser()
+              parser.add_argument('src_dir')
+              parser.add_argument('dest_dir')
+              args = parser.parse_args()
+              merge_subdirs(args.src_dir, args.dest_dir)
+          EOF
+
+          python3 merge.py data1 embedded_workbench
+          python3 merge.py data2 embedded_workbench
+          rm -rf data1 data2
+          python3 binpatch.py embedded_workbench/8051/bin/icc8051.exe "006AB9D0: B0 01 C2 08 00" "006ABBA0: B0 01 C2 08 00" "006AE430: 31 C0 C2 0C 00"
+          find embedded_workbench
+        shell: bash
+
+      - name: Download SDK
+        run: |
+          mkdir zstack
+          mv Components Projects zstack
+        shell: bash
+#
+#      - name: Clone project repo
+#        run: |
+#          git clone ${{ env.PROJECT_URL }} --depth 1
+#          mkdir -p zstack/Projects/zstack/HomeAutomation/
+#          mv ${{ env.PROJECT }} zstack/Projects/zstack/HomeAutomation/
+#        shell: bash
+#
+#      - name: Fetch submodules
+#        if: env.SUBMODULES == '1'
+#        run: |
+#          cd zstack/Projects/zstack/HomeAutomation/${{ env.PROJECT }}
+#          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+#          git submodule update --init --recursive
+#          cd -
+#        shell: bash
+
+      - name: Build firmware
+        id: firmware
+        run: |
+          embedded_workbench/common/bin/IarBuild.exe zstack/Projects/zstack/HomeAutomation/${{ env.PROJECT }}/CC2530DB/RgbLight.ewp -build ${{ env.CONFIGURATION }} -log all
+          echo "status=success" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4
+        if: steps.firmware.outputs.status == 'success' && !cancelled()
+        with:
+          name: firmware
+          path: |
+            zstack/Projects/zstack/HomeAutomation/${{ env.PROJECT }}/CC2530DB/${{ env.CONFIGURATION }}/Exe/*.hex
