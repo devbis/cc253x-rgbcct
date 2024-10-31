@@ -80,6 +80,7 @@
 
 #include "zcl_rgblight.h"
 #include "factory_reset.h"
+#include "commissioning.h"
 
 /*********************************************************************
  * GLOBAL VARIABLES
@@ -177,7 +178,8 @@ void osalInitTasks( void )
   zcl_Init( taskID++ );
   bdb_Init( taskID++ );
   zclFactoryResetter_Init(taskID++);
-  zclRGBLight_Init( taskID );
+  zclCommissioning_Init(taskID++);
+  zclRGBLight_Init( taskID++ );
 }
 
 /*********************************************************************

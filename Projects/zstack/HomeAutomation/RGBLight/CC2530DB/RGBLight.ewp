@@ -3493,6 +3493,9 @@
             <name>$PROJ_DIR$\..\Source\factory_reset.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\Source\commissioning.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\Source\factory_reset.h</name>
         </file>
         <file>
