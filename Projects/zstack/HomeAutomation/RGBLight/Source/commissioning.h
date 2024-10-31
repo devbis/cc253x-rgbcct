@@ -1,6 +1,8 @@
 #ifndef commissioning_h
 #define commissioning_h
 
+#include "comdef.h"
+
 #define APP_COMMISSIONING_CLOCK_DOWN_POLING_RATE_EVT  0x0001
 #define APP_COMMISSIONING_END_DEVICE_REJOIN_EVT       0x0002
 
