@@ -2147,20 +2147,20 @@
                 </option>
                 <option>
                     <name>GenerateExtraOutput</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>XExtraOutOverride</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>ExtraOutputFile</name>
-                    <state>RGBLight.sim</state>
+                    <state>$PROJ_DIR$\..\$CONFIG_NAME$.hex</state>
                 </option>
                 <option>
                     <name>ExtraOutputFormat</name>
                     <version>11</version>
-                    <state>60</state>
+                    <state>23</state>
                 </option>
                 <option>
                     <name>ExtraFormatVariant</name>
@@ -3490,10 +3490,10 @@
     <group>
         <name>App</name>
         <file>
-            <name>$PROJ_DIR$\..\Source\factory_reset.c</name>
+            <name>$PROJ_DIR$\..\Source\commissioning.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Source\commissioning.c</name>
+            <name>$PROJ_DIR$\..\Source\factory_reset.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\Source\factory_reset.h</name>
