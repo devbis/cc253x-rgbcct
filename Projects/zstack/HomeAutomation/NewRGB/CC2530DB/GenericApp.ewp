@@ -316,8 +316,8 @@
                     <state>xMT_ZDO_FUNC</state>
                     <state>xMT_ZDO_MGMT</state>
                     <state>xMT_APP_CNF_FUNC</state>
-                    <state>LEGACY_LCD_DEBUG</state>
-                    <state>LCD_SUPPORTED=DEBUG</state>
+                    <state>xLEGACY_LCD_DEBUG</state>
+                    <state>xLCD_SUPPORTED=DEBUG</state>
                     <state>MULTICAST_ENABLED=FALSE</state>
                     <state>ZCL_READ</state>
                     <state>ZCL_WRITE</state>

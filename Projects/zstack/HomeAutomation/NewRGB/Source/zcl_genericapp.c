@@ -114,7 +114,7 @@ byte zclGenericApp_TaskID;
 /*********************************************************************
  * GLOBAL FUNCTIONS
  */
- 
+
 /*********************************************************************
  * LOCAL VARIABLES
  */
@@ -161,7 +161,7 @@ static uint8 zclGenericApp_ProcessInDiscAttrsRspCmd( zclIncomingMsg_t *pInMsg );
 static uint8 zclGenericApp_ProcessInDiscAttrsExtRspCmd( zclIncomingMsg_t *pInMsg );
 #endif
 
-static void zclSampleApp_BatteryWarningCB( uint8 voltLevel);
+//static void zclSampleApp_BatteryWarningCB( uint8 voltLevel);
 
 /*********************************************************************
  * STATUS STRINGS
@@ -211,22 +211,22 @@ static zclGeneral_AppCallbacks_t zclGenericApp_CmdCallbacks =
 };
 
 /*********************************************************************
- * GENERICAPP_TODO: Add other callback structures for any additional application specific 
+ * GENERICAPP_TODO: Add other callback structures for any additional application specific
  *       Clusters being used, see available callback structures below.
  *
- *       bdbTL_AppCallbacks_t 
- *       zclApplianceControl_AppCallbacks_t 
- *       zclApplianceEventsAlerts_AppCallbacks_t 
- *       zclApplianceStatistics_AppCallbacks_t 
- *       zclElectricalMeasurement_AppCallbacks_t 
- *       zclGeneral_AppCallbacks_t 
- *       zclGp_AppCallbacks_t 
- *       zclHVAC_AppCallbacks_t 
- *       zclLighting_AppCallbacks_t 
- *       zclMS_AppCallbacks_t 
- *       zclPollControl_AppCallbacks_t 
- *       zclPowerProfile_AppCallbacks_t 
- *       zclSS_AppCallbacks_t  
+ *       bdbTL_AppCallbacks_t
+ *       zclApplianceControl_AppCallbacks_t
+ *       zclApplianceEventsAlerts_AppCallbacks_t
+ *       zclApplianceStatistics_AppCallbacks_t
+ *       zclElectricalMeasurement_AppCallbacks_t
+ *       zclGeneral_AppCallbacks_t
+ *       zclGp_AppCallbacks_t
+ *       zclHVAC_AppCallbacks_t
+ *       zclLighting_AppCallbacks_t
+ *       zclMS_AppCallbacks_t
+ *       zclPollControl_AppCallbacks_t
+ *       zclPowerProfile_AppCallbacks_t
+ *       zclSS_AppCallbacks_t
  *
  */
 
@@ -248,7 +248,7 @@ void zclGenericApp_Init( byte task_id )
 
   // Register the ZCL General Cluster Library callback functions
   zclGeneral_RegisterCmdCallbacks( GENERICAPP_ENDPOINT, &zclGenericApp_CmdCallbacks );
-  
+
   // GENERICAPP_TODO: Register other cluster command callbacks here
 
   // Register the application's attribute list
@@ -263,10 +263,10 @@ void zclGenericApp_Init( byte task_id )
 #endif
 
   // Register low voltage NV memory protection application callback
-  RegisterVoltageWarningCB( zclSampleApp_BatteryWarningCB );
+  // RegisterVoltageWarningCB( zclSampleApp_BatteryWarningCB );
 
   // Register for all key events - This app will handle all key events
-  RegisterForKeys( zclGenericApp_TaskID );
+//  RegisterForKeys( zclGenericApp_TaskID );
 
   bdb_RegisterCommissioningStatusCB( zclGenericApp_ProcessCommissioningStatus );
   bdb_RegisterIdentifyTimeChangeCB( zclGenericApp_ProcessIdentifyTimeChange );
@@ -357,8 +357,8 @@ uint16 zclGenericApp_event_loop( uint8 task_id, uint16 events )
 
     return ( events ^ GENERICAPP_MAIN_SCREEN_EVT );
   }
-  
-#if ZG_BUILD_ENDDEVICE_TYPE    
+
+#if ZG_BUILD_ENDDEVICE_TYPE
   if ( events & GENERICAPP_END_DEVICE_REJOIN_EVT )
   {
     bdb_ZedAttemptRecoverNwk();
@@ -367,31 +367,31 @@ uint16 zclGenericApp_event_loop( uint8 task_id, uint16 events )
 #endif
 
   /* GENERICAPP_TODO: handle app events here */
-  
-  
+
+
   if ( events & GENERICAPP_EVT_1 )
   {
     // toggle LED 2 state, start another timer for 500ms
     HalLedSet ( HAL_LED_2, HAL_LED_MODE_TOGGLE );
     osal_start_timerEx( zclGenericApp_TaskID, GENERICAPP_EVT_1, 500 );
-    
+
     return ( events ^ GENERICAPP_EVT_1 );
   }
-  
+
   /*
   if ( events & GENERICAPP_EVT_2 )
   {
-    
+
     return ( events ^ GENERICAPP_EVT_2 );
   }
-  
+
   if ( events & GENERICAPP_EVT_3 )
   {
-    
+
     return ( events ^ GENERICAPP_EVT_3 );
   }
   */
-  
+
   // Discard unknown events
   return 0;
 }
@@ -416,14 +416,14 @@ static void zclGenericApp_HandleKeys( byte shift, byte keys )
   if ( keys & HAL_KEY_SW_1 )
   {
     static bool LED_OnOff = FALSE;
-    
+
     giGenAppScreenMode = GENERIC_MAINMODE;
-    
+
     /* GENERICAPP_TODO: add app functionality to hardware keys here */
-    
+
     // for example, start/stop LED 2 toggling with 500ms period
     if (LED_OnOff)
-    { 
+    {
       // if the LED is blinking, stop the osal timer and turn the LED off
       osal_stop_timerEx(zclGenericApp_TaskID, GENERICAPP_EVT_1);
       HalLedSet ( HAL_LED_2, HAL_LED_MODE_OFF );
@@ -448,22 +448,22 @@ static void zclGenericApp_HandleKeys( byte shift, byte keys )
   if ( keys & HAL_KEY_SW_3 )
   {
     giGenAppScreenMode = GENERIC_MAINMODE;
-  
-    // touchlink target commissioning, if enabled  
+
+    // touchlink target commissioning, if enabled
 #if ( defined ( BDB_TL_TARGET ) && (BDB_TOUCHLINK_CAPABILITY_ENABLED == TRUE) )
     bdb_StartCommissioning(BDB_COMMISSIONING_MODE_FINDING_BINDING);
     touchLinkTarget_EnableCommissioning( 30000 );
 #endif
-    
+
   }
   if ( keys & HAL_KEY_SW_4 )
   {
-    
+
    giGenAppScreenMode = giGenAppScreenMode ? GENERIC_MAINMODE : GENERIC_HELPMODE;
 #ifdef LCD_SUPPORTED
     HalLcdWriteString( (char *)sClearLine, HAL_LCD_LINE_2 );
 #endif
-    
+
   }
   if ( keys & HAL_KEY_SW_5 )
   {
@@ -609,7 +609,7 @@ static void zclGenericApp_ProcessCommissioningStatus(bdbCommissioningModeMsg_t *
       //We are on a network, what now?
 
     break;
-#if ZG_BUILD_ENDDEVICE_TYPE    
+#if ZG_BUILD_ENDDEVICE_TYPE
     case BDB_COMMISSIONING_PARENT_LOST:
       if(bdbCommissioningModeMsg->bdbCommissioningStatus == BDB_COMMISSIONING_NETWORK_RESTORED)
       {
@@ -621,7 +621,7 @@ static void zclGenericApp_ProcessCommissioningStatus(bdbCommissioningModeMsg_t *
         osal_start_timerEx(zclGenericApp_TaskID, GENERICAPP_END_DEVICE_REJOIN_EVT, GENERICAPP_END_DEVICE_REJOIN_DELAY);
       }
     break;
-#endif 
+#endif
   }
 }
 
@@ -702,9 +702,9 @@ static void zclGenericApp_BasicResetCB( void )
 
   /* GENERICAPP_TODO: remember to update this function with any
      application-specific cluster attribute variables */
-  
+
   zclGenericApp_ResetAttributesToDefaultValues();
-  
+
 }
 /*********************************************************************
  * @fn      zclSampleApp_BatteryWarningCB
@@ -715,17 +715,17 @@ static void zclGenericApp_BasicResetCB( void )
  *
  * @return  none
  */
-void zclSampleApp_BatteryWarningCB( uint8 voltLevel )
-{
-  if ( voltLevel == VOLT_LEVEL_CAUTIOUS )
-  {
-    // Send warning message to the gateway and blink LED
-  }
-  else if ( voltLevel == VOLT_LEVEL_BAD )
-  {
-    // Shut down the system
-  }
-}
+//void zclSampleApp_BatteryWarningCB( uint8 voltLevel )
+//{
+//  if ( voltLevel == VOLT_LEVEL_CAUTIOUS )
+//  {
+//    // Send warning message to the gateway and blink LED
+//  }
+//  else if ( voltLevel == VOLT_LEVEL_BAD )
+//  {
+//    // Shut down the system
+//  }
+//}
 
 /******************************************************************************
  *
@@ -763,7 +763,7 @@ static void zclGenericApp_ProcessIncomingMsg( zclIncomingMsg_t *pInMsg )
     case ZCL_CMD_REPORT:
       //bdb_ProcessIncomingReportingMsg( pInMsg );
       break;
-      
+
     case ZCL_CMD_DEFAULT_RSP:
       zclGenericApp_ProcessInDefaultRspCmd( pInMsg );
       break;
