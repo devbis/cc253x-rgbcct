@@ -460,7 +460,7 @@
                 </option>
                 <option>
                     <name>PreInclude</name>
-                    <state></state>
+                    <state>$PROJ_DIR$\..\Source\preinclude.h</state>
                 </option>
                 <option>
                     <name>CCLibConfigHeader</name>
@@ -2333,6 +2333,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\Source\zcl_genericapp_data.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Source\commissioning.c</name>
         </file>
     </group>
     <group>

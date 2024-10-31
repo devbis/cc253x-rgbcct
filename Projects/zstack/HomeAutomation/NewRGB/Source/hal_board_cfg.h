@@ -1,42 +1,3 @@
-/**************************************************************************************************
-  Filename:       hal_board_cfg.h
-  Revised:        $Date: 2015-02-17 14:17:44 -0800 (Tue, 17 Feb 2015) $
-  Revision:       $Revision: 42683 $
-
-  Description:    Declarations for the CC2530EM used on the SmartRF05EB.
-
-
-  Copyright 2009-2015 Texas Instruments Incorporated. All rights reserved.
-
-  IMPORTANT: Your use of this Software is limited to those specific rights
-  granted under the terms of a software license agreement between the user
-  who downloaded the software, his/her employer (which must be your employer)
-  and Texas Instruments Incorporated (the "License"). You may not use this
-  Software unless you agree to abide by the terms of the License. The License
-  limits your use, and you acknowledge, that the Software may not be modified,
-  copied or distributed unless embedded on a Texas Instruments microcontroller
-  or used solely and exclusively in conjunction with a Texas Instruments radio
-  frequency transceiver, which is integrated into your product. Other than for
-  the foregoing purpose, you may not use, reproduce, copy, prepare derivative
-  works of, modify, distribute, perform, display or sell this Software and/or
-  its documentation for any purpose.
-
-  YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
-  PROVIDED �AS IS� WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-  INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
-  NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
-  TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
-  NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
-  LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
-  INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
-  OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT
-  OF SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
-  (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
-
-  Should you have any questions regarding your right to use this Software,
-  contact Texas Instruments Incorporated at www.TI.com.
-**************************************************************************************************/
-
 #ifndef HAL_BOARD_CFG_H
 #define HAL_BOARD_CFG_H
 
@@ -50,33 +11,11 @@
 #include "hal_defs.h"
 #include "hal_types.h"
 
-/* ------------------------------------------------------------------------------------------------
- *                                       CC2590/CC2591 support
- *
- *                        Define HAL_PA_LNA_CC2590 if CC2530+CC2590EM is used
- *                        Define HAL_PA_LNA if CC2530+CC2591EM is used
- *                        Note that only one of them can be defined
- * ------------------------------------------------------------------------------------------------
- */
-#define xHAL_PA_LNA
-#define xHAL_PA_LNA_CC2590
-#define xHAL_PA_LNA_SE2431L
-#define xHAL_PA_LNA_CC2592
 
 
-/* ------------------------------------------------------------------------------------------------
- *                                       Board Indentifier
- *
- *      Define the Board Identifier to HAL_BOARD_CC2530EB_REV13 for SmartRF05 EB 1.3 board
- * ------------------------------------------------------------------------------------------------
- */
 
-#if !defined (HAL_BOARD_CC2530EB_REV17) && !defined (HAL_BOARD_CC2530EB_REV13)
-#define HAL_BOARD_CC2530EB_REV17
-#endif
 
-#define HAL_T3_CH0 1
-#define HAL_T3_CH1 1
+
 
 /* ------------------------------------------------------------------------------------------------
  *                                          Clock Speed
@@ -85,33 +24,34 @@
 
 #define HAL_CPU_CLOCK_MHZ     32
 
-/* This flag should be defined if the SoC uses the 32MHz crystal
- * as the main clock source (instead of DCO).
- */
-#define HAL_CLOCK_CRYSTAL
-
 /* 32 kHz clock source select in CLKCONCMD */
 #if !defined (OSC32K_CRYSTAL_INSTALLED) || (defined (OSC32K_CRYSTAL_INSTALLED) && (OSC32K_CRYSTAL_INSTALLED == TRUE))
-  #define OSC_32KHZ  0x00 /* external 32 KHz xosc */
+#define OSC_32KHZ  0x00 /* external 32 KHz xosc */
 #else
-  #define OSC_32KHZ  0x80 /* internal 32 KHz rcosc */
+#define OSC_32KHZ  0x80 /* internal 32 KHz rcosc */
 #endif
 
-#define HAL_CLOCK_STABLE()    st( while (CLKCONSTA != (CLKCONCMD_32MHZ | OSC_32KHZ)); )
+#define HAL_CLOCK_STABLE()
+
+/* ------------------------------------------------------------------------------------------------
+ *                                         Key Release detect support
+ * ------------------------------------------------------------------------------------------------
+ */
+#define HAL_KEY_CODE_NOKEY 0xff
+
 
 /* ------------------------------------------------------------------------------------------------
  *                                       LED Configuration
  * ------------------------------------------------------------------------------------------------
  */
 
-/* ------------------------------------------------------------------------------------------------
- *                                    Push Button Configuration
- * ------------------------------------------------------------------------------------------------
- */
+// TODO: review all HAL_BOARD_CC2530EB_REV17 and replace with HAL_BOARD_CC2530RC
+//       if applicable.
+#define HAL_NUM_LEDS            0
 
+#define HAL_LED_BLINK_DELAY()   st( { volatile uint32 i; for (i=0; i<0x5800; i++) { }; } )
 #define ACTIVE_LOW        !
 #define ACTIVE_HIGH       !!    /* double negation forces result to be '1' */
-
 
 /* ------------------------------------------------------------------------------------------------
  *                         OSAL NV implemented by internal flash pages.
@@ -150,7 +90,6 @@
 #define HAL_FLASH_IMPLICIT_CERT_OSET       0x78C
 
 #define HAL_NV_PAGE_BEG           (HAL_NV_PAGE_END-HAL_NV_PAGE_CNT+1)
-
 // Used by DMA macros to shift 1 to create a mask for DMA registers.
 #define HAL_NV_DMA_CH              0
 #define HAL_DMA_CH_RX              3
@@ -175,23 +114,26 @@
  */
 
 /* ----------- RF-frontend Connection Initialization ---------- */
-#if defined HAL_PA_LNA || defined HAL_PA_LNA_CC2590 || \
-    defined HAL_PA_LNA_SE2431L || defined HAL_PA_LNA_CC2592
+#if defined HAL_PA_LNA || defined HAL_PA_LNA_CC2590
 extern void MAC_RfFrontendSetup(void);
 #define HAL_BOARD_RF_FRONTEND_SETUP() MAC_RfFrontendSetup()
 #else
 #define HAL_BOARD_RF_FRONTEND_SETUP()
 #endif
 
+
+/* ------------------------------------------------------------------------------------------------
+ *                                            Macros
+ * ------------------------------------------------------------------------------------------------
+ */
+
+#define CLKCONCMD_VALUE (CLKCONCMD_32MHZ | OSC_32KHZ)
+
 /* ----------- Cache Prefetch control ---------- */
 #define PREFETCH_ENABLE()     st( FCTL = 0x08; )
 #define PREFETCH_DISABLE()    st( FCTL = 0x04; )
 
 /* ----------- Board Initialization ---------- */
-#if defined (HAL_BOARD_CC2530EB_REV17) && !defined (HAL_PA_LNA) && \
-    !defined (HAL_PA_LNA_CC2590) && !defined (HAL_PA_LNA_SE2431L) && \
-    !defined (HAL_PA_LNA_CC2592)
-
 #define HAL_BOARD_INIT()                                         \
 {                                                                \
   uint16 i;                                                      \
@@ -200,75 +142,16 @@ extern void MAC_RfFrontendSetup(void);
   while (!(SLEEPSTA & XOSC_STB));            /* wait for 32MHz XOSC stable */                     \
   asm("NOP");                                /* chip bug workaround */                            \
   for (i=0; i<504; i++) asm("NOP");          /* Require 63us delay for all revs */                \
-  CLKCONCMD = (CLKCONCMD_32MHZ | OSC_32KHZ); /* Select 32MHz XOSC and the source for 32K clock */ \
-  while (CLKCONSTA != (CLKCONCMD_32MHZ | OSC_32KHZ)); /* Wait for the change to be effective */   \
+  CLKCONCMD = CLKCONCMD_VALUE; /* Select 32MHz XOSC and the source for 32K clock */ \
+  while (CLKCONSTA != CLKCONCMD_VALUE); /* Wait for the change to be effective */   \
   SLEEPCMD |= OSC_PD;                        /* turn off 16MHz RC */                              \
                                                                  \
   /* Turn on cache prefetch mode */                              \
-  PREFETCH_ENABLE();                                             \
-                                                                 \
-  INIT_PWM_PINS();                                               \
+  PREFETCH_ENABLE();                                            \
 }
-
-#elif defined (HAL_BOARD_CC2530EB_REV13) || defined (HAL_PA_LNA) || \
-      defined (HAL_PA_LNA_CC2590)
-
-#define HAL_BOARD_INIT()                                         \
-{                                                                \
-  uint16 i;                                                      \
-                                                                 \
-  SLEEPCMD &= ~OSC_PD;                       /* turn on 16MHz RC and 32MHz XOSC */                \
-  while (!(SLEEPSTA & XOSC_STB));            /* wait for 32MHz XOSC stable */                     \
-  asm("NOP");                                /* chip bug workaround */                            \
-  for (i=0; i<504; i++) asm("NOP");          /* Require 63us delay for all revs */                \
-  CLKCONCMD = (CLKCONCMD_32MHZ | OSC_32KHZ); /* Select 32MHz XOSC and the source for 32K clock */ \
-  while (CLKCONSTA != (CLKCONCMD_32MHZ | OSC_32KHZ)); /* Wait for the change to be effective */   \
-  SLEEPCMD |= OSC_PD;                        /* turn off 16MHz RC */                              \
-                                                                 \
-  /* Turn on cache prefetch mode */                              \
-  PREFETCH_ENABLE();                                             \
-
-  INIT_PWM_PINS();                                               \
-                                                                 \
-  /* Set PA/LNA HGM control P0_7 */                              \
-  P0DIR |= BV(7);                                                \
-                                                                 \
-  /* setup RF frontend if necessary */                           \
-  HAL_BOARD_RF_FRONTEND_SETUP();                                 \
-}
-
-#elif defined (HAL_PA_LNA_CC2592) || defined (HAL_PA_LNA_SE2431L)
-
-#define HAL_BOARD_INIT()                                         \
-{                                                                \
-  uint16 i;                                                      \
-                                                                 \
-  SLEEPCMD &= ~OSC_PD;                       /* turn on 16MHz RC and 32MHz XOSC */                \
-  while (!(SLEEPSTA & XOSC_STB));            /* wait for 32MHz XOSC stable */                     \
-  asm("NOP");                                /* chip bug workaround */                            \
-  for (i=0; i<504; i++) asm("NOP");          /* Require 63us delay for all revs */                \
-  CLKCONCMD = (CLKCONCMD_32MHZ | OSC_32KHZ); /* Select 32MHz XOSC and the source for 32K clock */ \
-  while (CLKCONSTA != (CLKCONCMD_32MHZ | OSC_32KHZ)); /* Wait for the change to be effective */   \
-  SLEEPCMD |= OSC_PD;                        /* turn off 16MHz RC */                              \
-                                                                 \
-  /* Turn on cache prefetch mode */                              \
-  PREFETCH_ENABLE();                                             \
-                                                                 \
-  /* set direction for GPIO outputs  */                          \
-  /* For SE2431L PA LNA this sets ANT_SEL to output */           \
-  /* For CC2592 this enables LNA */                              \
-  P1DIR |= BV(0);                                                \
-                                                                 \
-  // LED3_DDR |= LED3_BV;                                           \
-  INIT_PWM_PINS();                                               \
-                                                 \
-  /* Set PA/LNA HGM control P0_7 */                              \
-  P0DIR |= BV(7);                                                \
-                                                                 \
-  /* setup RF frontend if necessary */                           \
-  HAL_BOARD_RF_FRONTEND_SETUP();                                 \
-}
-#endif
+//  HAL_TURN_OFF_LED1();                                           \
+//  LED1_DDR |= LED1_BV;                                           \
+//  LED4_DDR |= LED4_BV;                                           \
 
 /* ----------- Debounce ---------- */
 #define HAL_DEBOUNCE(expr)    { int i; for (i=0; i<500; i++) { if (!(expr)) i = 0; } }
@@ -302,76 +185,34 @@ extern void MAC_RfFrontendSetup(void);
 
 #define DISABLE_LAMP  P0SEL &= ~( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */\
                       P0    &= ~( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */
-//#endif
 
-#define HAL_TURN_OFF_LED1()
-#define HAL_TURN_OFF_LED2()
-#define HAL_TURN_OFF_LED3()
-#define HAL_TURN_OFF_LED4()
+#define HAL_TURN_OFF_LED1()       asm("NOP")
+#define HAL_TURN_OFF_LED2()       asm("NOP")
+#define HAL_TURN_OFF_LED3()       asm("NOP")
+#define HAL_TURN_OFF_LED4()       asm("NOP")
 
-#define HAL_TURN_ON_LED1()
-#define HAL_TURN_ON_LED2()
-#define HAL_TURN_ON_LED3()
-#define HAL_TURN_ON_LED4()
+#define HAL_TURN_ON_LED1()        asm("NOP")
+#define HAL_TURN_ON_LED2()        asm("NOP")
+#define HAL_TURN_ON_LED3()        asm("NOP")
+#define HAL_TURN_ON_LED4()        asm("NOP")
 
-#define HAL_TOGGLE_LED1()
-#define HAL_TOGGLE_LED2()
-#define HAL_TOGGLE_LED3()
-#define HAL_TOGGLE_LED4()
+#define HAL_TOGGLE_LED1()         asm("NOP")
+#define HAL_TOGGLE_LED2()         asm("NOP")
+#define HAL_TOGGLE_LED3()         asm("NOP")
+#define HAL_TOGGLE_LED4()         asm("NOP")
 
-#define HAL_STATE_LED1()
-#define HAL_STATE_LED2()
-#define HAL_STATE_LED3()
-#define HAL_STATE_LED4()
-
-#define HAL_LED_BLINK_DELAY()
-
-/* ----------- XNV ---------- */
-#define XNV_SPI_BEGIN()             st(P1_3 = 0;)
-#define XNV_SPI_TX(x)               st(U1CSR &= ~0x02; U1DBUF = (x);)
-#define XNV_SPI_RX()                U1DBUF
-#define XNV_SPI_WAIT_RXRDY()        st(while (!(U1CSR & 0x02));)
-#define XNV_SPI_END()               st(P1_3 = 1;)
-
-// The TI reference design uses UART1 Alt. 2 in SPI mode.
-#define XNV_SPI_INIT() \
-st( \
-  /* Mode select UART1 SPI Mode as master. */\
-  U1CSR = 0; \
-  \
-  /* Setup for 115200 baud. */\
-  U1GCR = 11; \
-  U1BAUD = 216; \
-  \
-  /* Set bit order to MSB */\
-  U1GCR |= BV(5); \
-  \
-  /* Set UART1 I/O to alternate 2 location on P1 pins. */\
-  PERCFG |= 0x02;  /* U1CFG */\
-  \
-  /* Select peripheral function on I/O pins but SS is left as GPIO for separate control. */\
-  P1SEL |= 0xE0;  /* SELP1_[7:4] */\
-  /* P1.1,2,3: reset, LCD CS, XNV CS. */\
-  P1SEL &= ~0x0E; \
-  P1 |= 0x0E; \
-  P1_1 = 0; \
-  P1DIR |= 0x0E; \
-  \
-  /* Give UART1 priority over Timer3. */\
-  P2SEL &= ~0x20;  /* PRI2P1 */\
-  \
-  /* When SPI config is complete, enable it. */\
-  U1CSR |= 0x40; \
-  /* Release XNV reset. */\
-  P1_1 = 1; \
-)
+#define HAL_STATE_LED1()          0
+#define HAL_STATE_LED2()          0
+#define HAL_STATE_LED3()          0
+#define HAL_STATE_LED4()          0
 
 /* ----------- Minimum safe bus voltage ---------- */
 
 // Vdd/3 / Internal Reference X ENOB --> (Vdd / 3) / 1.15 X 127
 #define VDD_2_0  74   // 2.0 V required to safely read/write internal flash.
 #define VDD_2_7  100  // 2.7 V required for the Numonyx device.
-#define VDD_MIN_RUN  (VDD_2_0+4)  // VDD_MIN_RUN = VDD_MIN_NV
+
+#define VDD_MIN_RUN   VDD_2_0
 #define VDD_MIN_NV   (VDD_2_0+4)  // 5% margin over minimum to survive a page erase and compaction.
 #define VDD_MIN_GOOD (VDD_2_0+8)  // 10% margin over minimum to survive a page erase and compaction.
 #define VDD_MIN_XNV  (VDD_2_7+5)  // 5% margin over minimum to survive a page erase and compaction.
@@ -383,7 +224,7 @@ st( \
 
 /* Set to TRUE enable H/W TIMER usage, FALSE disable it */
 #ifndef HAL_TIMER
-#define HAL_TIMER TRUE
+#define HAL_TIMER FALSE
 #endif
 
 /* Set to TRUE enable ADC usage, FALSE disable it */
@@ -407,7 +248,7 @@ st( \
 #endif
 
 #ifndef HAL_AES_DMA
-#define HAL_AES_DMA TRUE
+#define HAL_AES_DMA FALSE
 #endif
 
 /* Set to TRUE enable LCD usage, FALSE disable it */
@@ -415,13 +256,17 @@ st( \
 #define HAL_LCD FALSE
 #endif
 
-///* Set to TRUE enable LED usage, FALSE disable it */
+/* Set to TRUE enable LED usage, FALSE disable it */
 #ifndef HAL_LED
 #define HAL_LED FALSE
 #endif
-//#if (!defined BLINK_LEDS) && (HAL_LED == TRUE)
-//#define BLINK_LEDS
-//#endif
+#if (!defined BLINK_LEDS) && (HAL_LED == TRUE)
+#define BLINK_LEDS
+#endif
+
+#ifndef HAL_MOTION
+#define HAL_MOTION FALSE
+#endif
 
 /* Set to TRUE enable KEY usage, FALSE disable it */
 #ifndef HAL_KEY
@@ -430,11 +275,7 @@ st( \
 
 /* Set to TRUE enable UART usage, FALSE disable it */
 #ifndef HAL_UART
-//#if (defined ZAPP_P1) || (defined ZAPP_P2) || (defined ZTOOL_P1) || (defined ZTOOL_P2)
-//#define HAL_UART TRUE
-//#else
 #define HAL_UART FALSE
-//#endif
 #endif
 
 #if HAL_UART
@@ -478,29 +319,11 @@ st( \
 
 /* USB is not used for CC2530 configuration */
 #define HAL_UART_USB  0
+
+#ifndef HAL_BUZZER
+#define HAL_BUZZER FALSE
 #endif
+
 /*******************************************************************************************************
 */
-
-//#if defined (PWM_ALT2)
-//#define INIT_PWM_PINS()                                          \
-//{                                                                \
-//  /* Drive LED1 from timer 1 ch2 and LED2 from timer 1 ch1 */    \
-//  /* unfortunitly we can not connect any other leds to the timer PWM */ \
-//  /* on the SmartRF05EB/BB */                                    \
-//  PERCFG |= 0x40; /* set timer 1 to use alt configuration*/      \
-//  P1SEL |= ( 0x1 | 0x2 );                                        \
-//  P1DIR |= ( 0x1 | 0x2 );                                        \
-//}
-//#else
-#define INIT_PWM_PINS()                                          \
-{                                                                \
-  PERCFG &= ~(0x40 | 0x20); /* bit 6 = 0 */                             \
-  P0SEL |= ( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */            \
-  P0DIR |= ( 0x08 | 0x10 | 0x20 | 0x40); /* P0.3:6 */            \
-  /*PERCFG &= ~0x20; //select of alternative 1 for timer 3 */    \
-  P2SEL |= 0x20; /* Timer 3 priority over USART1 */              \
-  P1SEL |= 0xC0; /*P1.6、P1.7*/                                  \
-  P1DIR |= 0xC0; /*P1.6、P1.7*/                                  \
-}
-//#endif
+#endif
