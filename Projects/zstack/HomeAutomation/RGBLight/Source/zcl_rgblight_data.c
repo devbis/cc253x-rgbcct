@@ -104,8 +104,9 @@ const uint16 zclSampleLight_clusterRevision_all = 0x0001; //currently all cluste
 const uint8 zclSampleLight_HWRevision = SAMPLELIGHT_HWVERSION;
 const uint8 zclSampleLight_ZCLVersion = SAMPLELIGHT_ZCLVERSION;
 const uint8 zclSampleLight_ManufacturerName[] = { 11, 'L','i','f','e','C','o','n','t','r','o','l' };
-const uint8 zclSampleLight_ModelId[] = { 4, 'B','U','L','B' };
-const uint8 zclSampleLight_DateCode[] = { 8, '2','0','2','4','0','9','3','1' };
+//const uint8 zclSampleLight_ModelId[] = { 4, 'B','U','L','B' };
+const uint8 zclSampleLight_ModelId[] = { 11, 'v','i','v','i',' ','Z','L','i','g','h','t' }; //vivi ZLight
+const uint8 zclSampleLight_DateCode[] = { 8, '2','0','2','4','1','0','3','1' };
 const uint8 zclSampleLight_PowerSource = POWER_SOURCE_MAINS_1_PHASE;
 
 uint8 zclSampleLight_LocationDescription[17];
