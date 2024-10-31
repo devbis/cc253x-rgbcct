@@ -279,7 +279,7 @@
                 </option>
                 <option>
                     <name>OGChipConfigPath</name>
-                    <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\CC2530F256.i51</state>
+                    <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\CC25xx\3x\CC2530F256.i51</state>
                 </option>
             </data>
         </settings>
@@ -793,7 +793,7 @@
                 </option>
                 <option>
                     <name>OutputFile</name>
-                    <state>GenericApp.d51</state>
+                    <state>GenericApp.hex</state>
                 </option>
                 <option>
                     <name>OutputFormat</name>
@@ -967,7 +967,7 @@
                 </option>
                 <option>
                     <name>DebugInformation</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>RuntimeControl</name>
@@ -983,20 +983,20 @@
                 </option>
                 <option>
                     <name>GenerateExtraOutput</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>XExtraOutOverride</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>ExtraOutputFile</name>
-                    <state>GenericApp.sim</state>
+                    <state>$PROJ_DIR$\..\firmwares\$CONFIG_NAME$.hex</state>
                 </option>
                 <option>
                     <name>ExtraOutputFormat</name>
                     <version>11</version>
-                    <state>60</state>
+                    <state>23</state>
                 </option>
                 <option>
                     <name>ExtraFormatVariant</name>
@@ -2923,14 +2923,12 @@
         <file>
             <name>$PROJ_DIR$\..\..\..\Tools\CC2530DB\f8wEndev.cfg</name>
             <excluded>
-                <configuration>CoordinatorEB</configuration>
                 <configuration>RGBLightRouter</configuration>
             </excluded>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\Tools\CC2530DB\f8wRouter.cfg</name>
             <excluded>
-                <configuration>CoordinatorEB</configuration>
                 <configuration>EndDeviceEB</configuration>
             </excluded>
         </file>
