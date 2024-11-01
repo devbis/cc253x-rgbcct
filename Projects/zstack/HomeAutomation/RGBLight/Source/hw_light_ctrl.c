@@ -66,6 +66,8 @@
 
 #include "math.h"
 
+//#include "hal_board_cfg.h"
+
 
 /*********************************************************************
  * MACROS
@@ -546,12 +548,12 @@ static void hwLight_UpdateColor(void)
   {
 #ifdef ZLL_HW_LED_LAMP
     hwLight_UpdateLampColor(zclColor_CurrentX, zclColor_CurrentY, zclSampleLight_LevelCurrentLevel);
-#else //ZLL_HW_LED_LAMP #else
-  #if defined ZCL_LEVEL_CTRL
-    HalLcdWriteStringValue( "Level:", zclSampleLight_LevelCurrentLevel, 10, HAL_LCD_LINE_1 );
-  #endif //ZCL_LEVEL_CTRL
-    HalLcdWriteStringValue( "x: 0x", zclColor_CurrentX, 16, HAL_LCD_LINE_2 );
-    HalLcdWriteStringValue( "y: 0x", zclColor_CurrentY, 16, HAL_LCD_LINE_3 );
+//#else //ZLL_HW_LED_LAMP #else
+//  #if defined ZCL_LEVEL_CTRL
+//    HalLcdWriteStringValue( "Level:", zclSampleLight_LevelCurrentLevel, 10, HAL_LCD_LINE_1 );
+//  #endif //ZCL_LEVEL_CTRL
+//    HalLcdWriteStringValue( "x: 0x", zclColor_CurrentX, 16, HAL_LCD_LINE_2 );
+//    HalLcdWriteStringValue( "y: 0x", zclColor_CurrentY, 16, HAL_LCD_LINE_3 );
 #endif //ZLL_HW_LED_LAMP
   }
   else
@@ -566,12 +568,12 @@ static void hwLight_UpdateColor(void)
       }
 #ifdef ZLL_HW_LED_LAMP
       hwLight_UpdateLampColorHueSat( zclColor_CurrentHue, zclColor_CurrentSaturation, zclSampleLight_LevelCurrentLevel);
-#else //ZLL_HW_LED_LAMP #else
-  #if defined ZCL_LEVEL_CTRL
-      HalLcdWriteStringValue( "Level:", zclSampleLight_LevelCurrentLevel, 10, HAL_LCD_LINE_1 );
-  #endif //ZCL_LEVEL_CTRL
-      HalLcdWriteStringValue( "EnhHue: 0x", zclColor_EnhancedCurrentHue, 16, HAL_LCD_LINE_2 );
-      HalLcdWriteStringValue( "Sat:", zclColor_CurrentSaturation, 10, HAL_LCD_LINE_3 );
+//#else //ZLL_HW_LED_LAMP #else
+//  #if defined ZCL_LEVEL_CTRL
+//      HalLcdWriteStringValue( "Level:", zclSampleLight_LevelCurrentLevel, 10, HAL_LCD_LINE_1 );
+//  #endif //ZCL_LEVEL_CTRL
+//      HalLcdWriteStringValue( "EnhHue: 0x", zclColor_EnhancedCurrentHue, 16, HAL_LCD_LINE_2 );
+//      HalLcdWriteStringValue( "Sat:", zclColor_CurrentSaturation, 10, HAL_LCD_LINE_3 );
 #endif //ZLL_HW_LED_LAMP
     }
     else
@@ -579,12 +581,12 @@ static void hwLight_UpdateColor(void)
       zclColor_EnhancedCurrentHue = zclColor_CurrentHue<<8;
 #ifdef ZLL_HW_LED_LAMP
       hwLight_UpdateLampColorHueSat( zclColor_CurrentHue, zclColor_CurrentSaturation, zclSampleLight_LevelCurrentLevel);
-#else //ZLL_HW_LED_LAMP #else
-  #if defined ZCL_LEVEL_CTRL
-      HalLcdWriteStringValue( "Level:", zclSampleLight_LevelCurrentLevel, 10, HAL_LCD_LINE_1 );
-  #endif //ZCL_LEVEL_CTRL
-      HalLcdWriteStringValue( "Hue:", zclColor_CurrentHue, 10, HAL_LCD_LINE_2 );
-      HalLcdWriteStringValue( "Sat:", zclColor_CurrentSaturation, 10, HAL_LCD_LINE_3 );
+//#else //ZLL_HW_LED_LAMP #else
+//  #if defined ZCL_LEVEL_CTRL
+//      HalLcdWriteStringValue( "Level:", zclSampleLight_LevelCurrentLevel, 10, HAL_LCD_LINE_1 );
+//  #endif //ZCL_LEVEL_CTRL
+//      HalLcdWriteStringValue( "Hue:", zclColor_CurrentHue, 10, HAL_LCD_LINE_2 );
+//      HalLcdWriteStringValue( "Sat:", zclColor_CurrentSaturation, 10, HAL_LCD_LINE_3 );
 #endif //ZLL_HW_LED_LAMP
     }
   }
@@ -609,10 +611,10 @@ static void hwLight_UpdateLevel( uint8 level )
 
   hwLight_UpdateLampLevel( level );
 
-#else //ZLL_HW_LED_LAMP #else
-
-  HalLcdWriteStringValue( "Level:", zclSampleLight_LevelCurrentLevel, 10, HAL_LCD_LINE_1 );
-
+//#else //ZLL_HW_LED_LAMP #else
+//
+//  HalLcdWriteStringValue( "Level:", zclSampleLight_LevelCurrentLevel, 10, HAL_LCD_LINE_1 );
+//
 #endif //ZLL_HW_LED_LAMP
 }
 
@@ -633,7 +635,7 @@ void hwLight_UpdateLampLevel( uint8 level )
   //gamma correct the level
   gammaCorrectedLevel = pow( ( (float)level / LEVEL_MAX ), (float)GAMMA_VALUE ) * (float)LEVEL_MAX;
 
-  halTimer1SetChannelDuty (WHITE_LED, (uint16)(((uint32)gammaCorrectedLevel*PWM_FULL_DUTY_CYCLE)/LEVEL_MAX) );
+  halTimer1SetChannelDuty (WHITE_LED11, (uint16)(((uint32)gammaCorrectedLevel*PWM_FULL_DUTY_CYCLE)/LEVEL_MAX) );
 }
 #endif //ZLL_HW_LED_LAMP
 #endif //ZCL_LEVEL_CTRL
