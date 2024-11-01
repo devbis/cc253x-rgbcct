@@ -61,7 +61,7 @@ extern "C"
 /*********************************************************************
  * CONSTANTS
  */
-#define RGBLIGHT_ENDPOINT            8
+#define RGBLIGHT_ENDPOINT            11
 
 #define SAMPLELIGHT_NUM_GRPS            2 // Needed to include ZLL Target functionality
 
