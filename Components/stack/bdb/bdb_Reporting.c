@@ -41,7 +41,7 @@
 /*********************************************************************
  * INCLUDES
  */
- 
+
 #include "bdb.h"
 #include "zcl.h"
 #include "ZDObject.h"
@@ -49,7 +49,7 @@
 #include "OSAL.h"
 #include "zcl_ms.h"
 #include "bdb_interface.h"
-   
+
 /*********************************************************************
  * MACROS
  */
@@ -66,33 +66,33 @@
 #define BDBREPORTING_HASBINDING_FLAG_MASK      0x01
 #define BDBREPORTING_NONEXTINCREMENT_FLAG_MASK 0x02
 
-   
-#if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 8   
+
+#if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 8
 #define BDBREPORTING_DEFAULTCHANGEVALUE {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 #endif
-#if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 4   
+#if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 4
 #define BDBREPORTING_DEFAULTCHANGEVALUE {0x00, 0x00, 0x00, 0x00}
 #endif
-#if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 2   
+#if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 2
 #define BDBREPORTING_DEFAULTCHANGEVALUE {0x00, 0x00}
 #endif
 
 #define BDBREPORTING_MAXINTERVAL_DEFAULT 0x0000
 #define BDBREPORTING_MININTERVAL_DEFAULT 0xFFFF
-   
+
 /*********************************************************************
  * TYPEDEFS
  */
 //Data to hold informaation about an attribute in a linked list thats inside
-//the cluster-endpoint entry 
+//the cluster-endpoint entry
 typedef struct
 {
   uint16 attrID;
   uint8  lastValueReported[BDBREPORTING_MAX_ANALOG_ATTR_SIZE];
   uint8  reportableChange[BDBREPORTING_MAX_ANALOG_ATTR_SIZE];
 } bdbReportAttrLive_t;
-   
-   
+
+
 //This structrue holds the data of a attribute reporting configiration that
 //is used at runtime and it's saved in the NV
 typedef struct
@@ -106,9 +106,9 @@ typedef struct
   uint16 defaultMaxReportInt;
   uint8  reportableChange[BDBREPORTING_MAX_ANALOG_ATTR_SIZE];
   uint8  defaultReportableChange[BDBREPORTING_MAX_ANALOG_ATTR_SIZE];
-} bdbReportAttrCfgData_t;   
+} bdbReportAttrCfgData_t;
 
-//This structure represents a node in the linked list of the attributes 
+//This structure represents a node in the linked list of the attributes
 //data in the cluster-endpoint entry
 typedef struct bdbLinkedListAttrItem
 {
@@ -117,14 +117,14 @@ typedef struct bdbLinkedListAttrItem
 } bdbLinkedListAttrItem_t;
 
 
-//This structure represents a linked list of the attributes 
+//This structure represents a linked list of the attributes
 //data in the cluster-endpoint entry
 typedef struct bdbAttrLinkedListAttr
 {
   uint8 numItems;
   bdbLinkedListAttrItem_t *head;
 } bdbAttrLinkedListAttr_t;
-   
+
 // This structure is an entry of a cluster-endpoint table used by the reporting
 //code (the consolidated values) to actually report periodically
 typedef struct
@@ -136,15 +136,15 @@ typedef struct
   uint16  consolidatedMaxReportInt;           // attribute data type
   uint16  timeSinceLastReport;
   bdbAttrLinkedListAttr_t attrLinkedList;
-} bdbReportAttrClusterEndpoint_t;   
+} bdbReportAttrClusterEndpoint_t;
 
 
-//This structure serves to hold the flags data of a bdbReportAttrClusterEndpoint_t 
+//This structure serves to hold the flags data of a bdbReportAttrClusterEndpoint_t
 //with key =(endpoint,cluster) in instance of the bdb reporting where the table is regenerated
 typedef struct
 {
   uint8 flags;
-  uint8  endpoint;            
+  uint8  endpoint;
   uint16  cluster;
 } bdbReportFlagsHolder_t;
 
@@ -152,15 +152,15 @@ typedef struct
 //entered by the application
 typedef struct
 {
-  uint8 endpoint; 
-  uint16 cluster; 
+  uint8 endpoint;
+  uint16 cluster;
   uint16 attrID;
   uint16 minReportInt;
   uint16 maxReportInt;
   uint8  reportableChange[BDBREPORTING_MAX_ANALOG_ATTR_SIZE];
 } bdbReportAttrDefaultCfgData_t;
-   
-//This structure represents a node in the linked list of the default attributes 
+
+//This structure represents a node in the linked list of the default attributes
 //configurations entered by the application
 typedef struct bdbRepAttrDefaultCfgRecordLinkedListItem
 {
@@ -168,7 +168,7 @@ typedef struct bdbRepAttrDefaultCfgRecordLinkedListItem
   struct bdbRepAttrDefaultCfgRecordLinkedListItem *next;
 } bdbRepAttrDefaultCfgRecordLinkedListItem_t;
 
-//This structure represents the linked list of the default attributes 
+//This structure represents the linked list of the default attributes
 //configurations entered by the application
 typedef struct bdbRepAttrDefaultCfgRecordLinkedList
 {
@@ -197,12 +197,12 @@ uint8 gAttrDataValue[BDBREPORTING_MAX_ANALOG_ATTR_SIZE];
 
 //Table of cluster-endpoint entries used to report periodically
 bdbReportAttrClusterEndpoint_t bdb_reportingClusterEndpointArray[BDB_MAX_CLUSTERENDPOINTS_REPORTING];
-//Current size of the cluster-endpoint table  
+//Current size of the cluster-endpoint table
 uint8 bdb_reportingClusterEndpointArrayCount;
 //This variable has the timeout value of the currrent timer use to report peridically
 uint16 bdb_reportingNextEventTimeout;
 //This variable hasthe index of the cluster-endpoint entry that trigger the current
-//timer use to report periodically 
+//timer use to report periodically
 uint8 bdb_reportingNextClusterEndpointIndex;
 //This is the table that holds in the memory the attribute reporting configurations (dynamic table)
 bdbReportAttrCfgData_t* bdb_reportingAttrCfgRecordsArray;
@@ -224,7 +224,7 @@ uint8 bdb_reportingAcceptDefaultConfs;
  * LOCAL FUNCTIONS PROTOYPES
  */
 
-//Begin: Single linked list for attributes in a cluster-endpoint live entry methods 
+//Begin: Single linked list for attributes in a cluster-endpoint live entry methods
 static void bdb_InitReportAttrLiveValues( bdbReportAttrLive_t* item );
 static void bdb_linkedListAttrInit( bdbAttrLinkedListAttr_t *list );
 static uint8 bdb_linkedListAttrAdd( bdbAttrLinkedListAttr_t *list, bdbReportAttrLive_t* data );
@@ -251,7 +251,7 @@ static void bdb_clusterEndpointArrayIncrementAll( uint16 timeSinceLastReportIncr
 static void bdb_repAttrDefaultCfgRecordInitValues( bdbReportAttrDefaultCfgData_t* item );
 static void bdb_repAttrDefaultCfgRecordsLinkedListInit( bdbRepAttrDefaultCfgRecordLinkedList_t *list );
 static uint8 bdb_repAttrDefaultCfgRecordsLinkedListAdd( bdbRepAttrDefaultCfgRecordLinkedList_t *list, bdbReportAttrDefaultCfgData_t* data );
-static bdbRepAttrDefaultCfgRecordLinkedListItem_t* bdb_repAttrDefaultCfgRecordsLinkedListSearch( bdbRepAttrDefaultCfgRecordLinkedList_t *list, 
+static bdbRepAttrDefaultCfgRecordLinkedListItem_t* bdb_repAttrDefaultCfgRecordsLinkedListSearch( bdbRepAttrDefaultCfgRecordLinkedList_t *list,
                                                                                                 bdbReportAttrDefaultCfgData_t searchdata );
 static bdbReportAttrDefaultCfgData_t* bdb_repAttrDefaultCfgRecordsLinkedListRemove( bdbRepAttrDefaultCfgRecordLinkedList_t *list );
 static uint8 bdb_repAttrDefaultCfgRecordsLinkedListFreeAll( bdbRepAttrDefaultCfgRecordLinkedList_t *list );
@@ -260,7 +260,7 @@ static uint8 bdb_repAttrDefaultCfgRecordsLinkedListFreeAll( bdbRepAttrDefaultCfg
 //Begin: Reporting attr configuration array methods
 static void bdb_repAttrCfgRecordsArrayInit( void );
 static uint8 bdb_repAttrCfgRecordsArrayCreate( uint8 maxNumRepAttrConfRecords );
-static uint8 bdb_repAttrCfgRecordsArrayAdd( uint8 endpoint, uint16 cluster, uint16 attrID, uint16 minReportInt, 
+static uint8 bdb_repAttrCfgRecordsArrayAdd( uint8 endpoint, uint16 cluster, uint16 attrID, uint16 minReportInt,
                                            uint16 maxReportInt, uint8  reportableChange[], uint16 defMinReportInt, uint16 defMaxReportInt, uint8 defReportChange[] );
 static void bdb_repAttrCfgRecordsArrayFreeAll( void );
 static uint8 bdb_repAttrCfgRecordsArraySearch( uint8 endpoint, uint16 cluster, uint16 attrID );
@@ -311,8 +311,8 @@ void bdb_RepInit( void )
  /*********************************************************************
  * @fn          bdb_RepConstructReportingData
  *
- * @brief       Creates the attr reporting configurations by looking at 
- *              the app endpoints, cluster and attr definitions or loads 
+ * @brief       Creates the attr reporting configurations by looking at
+ *              the app endpoints, cluster and attr definitions or loads
  *              from NV the previous configurations.
  *
  * @param       none
@@ -328,13 +328,13 @@ void bdb_RepConstructReportingData( void )
   //Construct the endpoint-cluster array
   bdb_repAttrBuildClusterEndPointArrayBasedOnConfRecordsArray( );
   //Delete reporting configuration array, it's saved in NV
-  bdb_repAttrCfgRecordsArrayFreeAll( ); 
+  bdb_repAttrCfgRecordsArrayFreeAll( );
 }
 
  /*********************************************************************
  * @fn          bdb_RepMarkHasBindingInEndpointClusterArray
  *
- * @brief       Marks the binding flag as ON at the entry containig the 
+ * @brief       Marks the binding flag as ON at the entry containig the
  *              cluster-endpoint pair.
  *
  * @param       endpoint - endpoint id of the entry to locate
@@ -366,7 +366,7 @@ void bdb_RepMarkHasBindingInEndpointClusterArray( uint8 endpoint, uint16 cluster
  * @fn          bdb_RepStartReporting
  *
  * @brief       Restarts the periodic reporting timer, if the timer was already
- *              running it stops it and to before starting timer sets some state 
+ *              running it stops it and to before starting timer sets some state
  *              variables.
  *
  * @return      none
@@ -390,7 +390,7 @@ static void bdb_RepStartReporting( void )
  *
  * @brief       Restarts the periodic reporting timer, if the timer was already
  *              running it calculates the remaining time of timer before stopping it,
- *              then sustracts this elapsed time from the next event endpoint-cluster 
+ *              then sustracts this elapsed time from the next event endpoint-cluster
  *              table.
  *
  * @return      none
@@ -408,20 +408,20 @@ void bdb_RepStartOrContinueReporting( void )
   {
     uint16 elapsedTime = bdb_RepCalculateEventElapsedTime( remainingTimeOfEvent, bdb_reportingNextEventTimeout );
     bdb_RepStopEventTimer( );
-    
+
     bdb_clusterEndpointArrayIncrementAll( elapsedTime, BDBREPORTING_TRUE );
     bdb_RepStartReporting( );
   }
-  
+
 }
 
  /*********************************************************************
  * @fn          bdb_RepCalculateEventElapsedTime
  *
- * @brief       Calculate the elapsed time of the currently running timer, 
+ * @brief       Calculate the elapsed time of the currently running timer,
  *              the remaining time is roundup.
  *
- * @param       remainingTimeoutTimer - timeout value from the osal_get_timeoutEx method, 
+ * @param       remainingTimeoutTimer - timeout value from the osal_get_timeoutEx method,
  *              its in milliseconds units
  * @param       nextEventTimeout - the timeout given to the timer when it started
  *
@@ -433,14 +433,14 @@ static uint16 bdb_RepCalculateEventElapsedTime( uint32 remainingTimeoutTimer, ui
   passTimeOfEvent = nextEventTimeout*1000 >= remainingTimeoutTimer? nextEventTimeout*1000 - remainingTimeoutTimer: 0;
   uint16 elapsedTime = passTimeOfEvent / 1000;
   elapsedTime = elapsedTime + ((passTimeOfEvent % 1000) >0 ? 1:0); //roundup
-  return elapsedTime;  
+  return elapsedTime;
 }
 
  /*********************************************************************
  * @fn          bdb_RepProcessEvent
  *
- * @brief       Method that process the timer expired event in the reporting 
- *              code, it calculate the next cluster-endpoint entry based 
+ * @brief       Method that process the timer expired event in the reporting
+ *              code, it calculate the next cluster-endpoint entry based
  *              on the minimum with consolidatedMaxReportInt - timeSinceLastReport,
  *              updates timeSinceLastReport of all entries. If the minimum is zero,
  *              report the cluster-endpoint attrs.
@@ -457,16 +457,16 @@ void bdb_RepProcessEvent( void )
   }
    uint16 minVal = bdb_reportingClusterEndpointArray[minIndex].consolidatedMaxReportInt - bdb_reportingClusterEndpointArray[minIndex].timeSinceLastReport;
    if( minVal>0 )
-   { 
+   {
      bdb_reportingNextEventTimeout = minVal;
    }
    else
    {
-     //Something was triggered, report clusterEndpoint with minIndex 
+     //Something was triggered, report clusterEndpoint with minIndex
      bdb_reportingNextClusterEndpointIndex = minIndex;
      bdb_RepReport( BDBREPORTING_INVALIDINDEX );
      bdb_clusterEndpointArrayUpdateAt( minIndex, 0, BDBREPORTING_IGNORE, BDBREPORTING_IGNORE );
-     bdb_reportingNextEventTimeout = 0;  
+     bdb_reportingNextEventTimeout = 0;
    }
    bdb_RepRestartNextEventTimer( );
 }
@@ -497,26 +497,26 @@ uint8 bdb_ProcessInConfigReportCmd( zclIncomingMsg_t *pInMsg )
   {
     return ( FALSE );
   }
-  
+
   // get a pointer to the report configuration record
   cfgReportCmd = (zclCfgReportCmd_t *)pInMsg->attrCmd;
-  
+
   if( cfgReportCmd->numAttr == 0 )
   {
     return ( FALSE );
   }
-  
+
   // Allocate space for the response command
-  cfgReportRspCmd = (zclCfgReportRspCmd_t *)osal_mem_alloc( sizeof ( zclCfgReportRspCmd_t ) + 
+  cfgReportRspCmd = (zclCfgReportRspCmd_t *)osal_mem_alloc( sizeof ( zclCfgReportRspCmd_t ) +
                                                             ( cfgReportCmd->numAttr * sizeof ( zclCfgReportStatus_t) ) );
   if ( cfgReportRspCmd == NULL )
   {
     return ( FALSE );
   }
- 
+
   //stop any attribute reporting
   bdb_RepStopEventTimer( );
-  
+
   //Load cfg records from NV
   status = bdb_RepLoadCfgRecords( );
   if( status != BDBREPORTING_SUCCESS )
@@ -524,7 +524,7 @@ uint8 bdb_ProcessInConfigReportCmd( zclIncomingMsg_t *pInMsg )
     osal_mem_free( cfgReportRspCmd );
     return ( FALSE );
   }
- 
+
   // Process each Attribute Reporting Configuration record
   uint8 confchanged = BDBREPORTING_FALSE;
   iNumRspRecords = 0;
@@ -533,12 +533,12 @@ uint8 bdb_ProcessInConfigReportCmd( zclIncomingMsg_t *pInMsg )
     reportRec = &(cfgReportCmd->attrList[i]);
 
     status = ZCL_STATUS_SUCCESS;  // assume success for this rsp record
-    
+
     uint8 atrrCfgRecordIndex =  bdb_repAttrCfgRecordsArraySearch( pInMsg->endPoint, pInMsg->clusterId, reportRec->attrID );
     uint8 status2 = zclFindAttrRec( pInMsg->endPoint, pInMsg->clusterId, reportRec->attrID, &attrRec );
     if( atrrCfgRecordIndex == BDBREPORTING_INVALIDINDEX || status2 == 0 )
     {
-      //No cfg record found, 
+      //No cfg record found,
       status = ZCL_STATUS_INVALID_VALUE;
     }
     else
@@ -558,7 +558,7 @@ uint8 bdb_ProcessInConfigReportCmd( zclIncomingMsg_t *pInMsg )
               bdb_reportingAttrCfgRecordsArray[atrrCfgRecordIndex].maxReportInt = bdb_reportingAttrCfgRecordsArray[atrrCfgRecordIndex].defaultMaxReportInt;
               osal_memset( bdb_reportingAttrCfgRecordsArray[atrrCfgRecordIndex].reportableChange, 0x00, BDBREPORTING_MAX_ANALOG_ATTR_SIZE );
               osal_memcpy( bdb_reportingAttrCfgRecordsArray[atrrCfgRecordIndex].reportableChange, bdb_reportingAttrCfgRecordsArray[atrrCfgRecordIndex].defaultReportableChange, BDBREPORTING_MAX_ANALOG_ATTR_SIZE );
-              status = ZCL_STATUS_SUCCESS;  
+              status = ZCL_STATUS_SUCCESS;
             }
             else
             {
@@ -572,7 +572,7 @@ uint8 bdb_ProcessInConfigReportCmd( zclIncomingMsg_t *pInMsg )
                 osal_memset( bdb_reportingAttrCfgRecordsArray[atrrCfgRecordIndex].reportableChange, 0x00, BDBREPORTING_MAX_ANALOG_ATTR_SIZE );
                 osal_memcpy( bdb_reportingAttrCfgRecordsArray[atrrCfgRecordIndex].reportableChange, reportRec->reportableChange, zclGetDataTypeLength( reportRec->dataType ) );
               }
-              status = ZCL_STATUS_SUCCESS;             
+              status = ZCL_STATUS_SUCCESS;
             }
           }
           else
@@ -592,7 +592,7 @@ uint8 bdb_ProcessInConfigReportCmd( zclIncomingMsg_t *pInMsg )
       {
         status = ZCL_STATUS_SUCCESS;
       }
-    
+
     }
 
     // If not successful then record the status
@@ -618,7 +618,7 @@ uint8 bdb_ProcessInConfigReportCmd( zclIncomingMsg_t *pInMsg )
 
     bdb_RepSetupReporting( );
   }
-  
+
   // if no response records, then just say 1 with status of success
   cfgReportRspCmd->numAttr = iNumRspRecords;
   if ( cfgReportRspCmd->numAttr == 0 )
@@ -664,16 +664,16 @@ uint8 bdb_ProcessInReadReportCfgCmd( zclIncomingMsg_t *pInMsg )
   uint8 i;
   uint8 reportChangeLen;
   uint8 status;
-  
+
   // Find Ep Descriptor
   endPointDesc_t* epDescriptor = bdb_FindEpDesc( pInMsg->endPoint );
   if( epDescriptor==NULL )
   {
     return ( FALSE ); // EMBEDDED RETURN
   }
-  
+
   readReportCfgCmd = (zclReadReportCfgCmd_t *)pInMsg->attrCmd;
-  
+
   // Find out the response length (Reportable Change field is of variable length)
   for ( i = 0; i < readReportCfgCmd->numAttr; i++ )
   {
@@ -704,7 +704,7 @@ uint8 bdb_ProcessInReadReportCfgCmd( zclIncomingMsg_t *pInMsg )
   {
     return ( FALSE ); // Out of memory
   }
-  
+
   //Load cfg records from NV
   status = bdb_RepLoadCfgRecords( );
   if( status != BDBREPORTING_SUCCESS )
@@ -718,7 +718,7 @@ uint8 bdb_ProcessInReadReportCfgCmd( zclIncomingMsg_t *pInMsg )
   {
     reportRspRec = &(readReportCfgRspCmd->attrList[i]);
     status = ZCL_STATUS_SUCCESS;  // assume success for this rsp record
-    
+
     uint8 atrrCfgRecordIndex =  bdb_repAttrCfgRecordsArraySearch( pInMsg->endPoint, pInMsg->clusterId, readReportCfgCmd->attrList[i].attrID );
     uint8 status2 = zclFindAttrRec( pInMsg->endPoint, pInMsg->clusterId, readReportCfgCmd->attrList[i].attrID, &attrRec );
     if( atrrCfgRecordIndex != BDBREPORTING_INVALIDINDEX && status2 )
@@ -735,7 +735,7 @@ uint8 bdb_ProcessInReadReportCfgCmd( zclIncomingMsg_t *pInMsg )
       {
         // Attribute not in the Mandatory Reportable Attribute list
         status = ZCL_STATUS_UNREPORTABLE_ATTRIBUTE;
-      }      
+      }
     }
     else
     {
@@ -747,13 +747,13 @@ uint8 bdb_ProcessInReadReportCfgCmd( zclIncomingMsg_t *pInMsg )
     reportRspRec->attrID = readReportCfgCmd->attrList[i].attrID;
     readReportCfgRspCmd->numAttr++;
   }
-  
+
   // Send the response back
   zcl_SendReadReportCfgRspCmd( pInMsg->endPoint, &(pInMsg->srcAddr),
                                pInMsg->clusterId, readReportCfgRspCmd, ZCL_FRAME_SERVER_CLIENT_DIR,
                                true, pInMsg->zclHdr.transSeqNum );
   osal_mem_free( readReportCfgRspCmd );
-  
+
   bdb_repAttrCfgRecordsArrayFreeAll( );//Free reporting cfg array from memory, its saved in NV
 
   return ( TRUE );
@@ -766,7 +766,7 @@ void bdb_RepUpdateMarkBindings( void )
   uint8 i;
   for(i=0; i<bdb_reportingClusterEndpointArrayCount; i++)
   {
-    BindingEntry_t* bEntry = bindFind( bdb_reportingClusterEndpointArray[i].endpoint,bdb_reportingClusterEndpointArray[i].cluster,0 ); 
+    BindingEntry_t* bEntry = bindFind( bdb_reportingClusterEndpointArray[i].endpoint,bdb_reportingClusterEndpointArray[i].cluster,0 );
     if(bEntry !=  NULL)
     { //Found a binding with the given cluster and endpoint, mark the Endpoint-cluster entry (this activates reporting)
       if( FLAGS_CHECKFLAG( bdb_reportingClusterEndpointArray[i].flags, BDBREPORTING_HASBINDING_FLAG_MASK ) == BDBREPORTING_FALSE )
@@ -783,7 +783,7 @@ void bdb_RepUpdateMarkBindings( void )
       }
     }
   }
-  
+
   //Checking is bdb_reporting timer is active
   if( osal_get_timeoutEx( bdb_TaskID, BDB_REPORT_TIMEOUT) > 0 )
   {
@@ -799,7 +799,7 @@ void bdb_RepUpdateMarkBindings( void )
     if( numMarkedEntries > 0 )
     {
       //Start timer
-      bdb_RepStartReporting( );      
+      bdb_RepStartReporting( );
     }
   }
 }
@@ -809,7 +809,7 @@ void bdb_RepUpdateMarkBindings( void )
  */
 
 /*
-* Begin: Single linked list for attributes in a cluster-endpoint live entry methods 
+* Begin: Single linked list for attributes in a cluster-endpoint live entry methods
 */
 
 /*********************************************************************
@@ -819,7 +819,7 @@ void bdb_RepUpdateMarkBindings( void )
  *
  * @param   item - Data to initiate
  *
- * @return 
+ * @return
  */
 static void bdb_InitReportAttrLiveValues( bdbReportAttrLive_t* item )
 {
@@ -840,7 +840,7 @@ static void bdb_InitReportAttrLiveValues( bdbReportAttrLive_t* item )
  *
  * @param   list - Pointer to linked list
  *
- * @return 
+ * @return
  */
 static void bdb_linkedListAttrInit( bdbAttrLinkedListAttr_t *list )
 {
@@ -874,13 +874,13 @@ static uint8 bdb_linkedListAttrAdd( bdbAttrLinkedListAttr_t *list, bdbReportAttr
 /*********************************************************************
  * @fn      bdb_linkedListAttrSearch
  *
- * @brief   Travers the linked list and search for a node (bdbReportAttrLive_t 
+ * @brief   Travers the linked list and search for a node (bdbReportAttrLive_t
  *          data) with a specific attrID
  *
  * @param   list - Pointer to linked list
  * @param   searchdata - data to search the list (has a specific attrID)
  *
- * @return  A pointer to the node in the list has the searched data, NULL if 
+ * @return  A pointer to the node in the list has the searched data, NULL if
  *          not found
  */
 static bdbLinkedListAttrItem_t* bdb_linkedListAttrSearch( bdbAttrLinkedListAttr_t *list, bdbReportAttrLive_t* searchdata )
@@ -948,7 +948,7 @@ static uint8 bdb_linkedListAttrFreeAll( bdbAttrLinkedListAttr_t *list )
  *
  * @param   list - Pointer to linked list
  *
- * @return 
+ * @return
  */
 static void bdb_linkedListAttrClearList( bdbAttrLinkedListAttr_t *list )
 {
@@ -1001,7 +1001,7 @@ static bdbLinkedListAttrItem_t* bdb_linkedListAttrGetAtIndex( bdbAttrLinkedListA
  *
  * @brief   Initiates the clusterEndpoint array variables
  *
- * @return  
+ * @return
  */
 static void bdb_clusterEndpointArrayInit( void )
 {
@@ -1034,7 +1034,7 @@ static uint8 bdb_clusterEndpointArrayAdd( uint8 endpoint, uint16 cluster, uint16
   bdb_reportingClusterEndpointArray[bdb_reportingClusterEndpointArrayCount].timeSinceLastReport = timeSinceLastReport;
   bdb_linkedListAttrInit( &bdb_reportingClusterEndpointArray[bdb_reportingClusterEndpointArrayCount].attrLinkedList );
   FLAGS_TURNOFFALLFLAGS( bdb_reportingClusterEndpointArray[bdb_reportingClusterEndpointArrayCount].flags );
-  
+
   bdb_reportingClusterEndpointArrayCount++;
   return BDBREPORTING_SUCCESS;
 }
@@ -1049,7 +1049,7 @@ static uint8 bdb_clusterEndpointArrayGetMin( void )
   {
     if( FLAGS_CHECKFLAG( bdb_reportingClusterEndpointArray[i].flags, BDBREPORTING_HASBINDING_FLAG_MASK ) == BDBREPORTING_TRUE )
     { //Only do with valid entries (HasBinding==true)
-      if( bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt != BDBREPORTING_NOPERIODIC &&  
+      if( bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt != BDBREPORTING_NOPERIODIC &&
          bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt != BDBREPORTING_REPORTOFF )
       {
         //If maxInterval is BDBREPORTING_NOPERIODIC=0x0000 or BDBREPORTING_REPORTOFF=0xFFFF, ignore to calculate min
@@ -1162,7 +1162,7 @@ static void bdb_clusterEndpointArrayIncrementAll( uint16 timeSinceLastReportIncr
   {
     doIncrement = BDBREPORTING_FALSE;
     if( FLAGS_CHECKFLAG( bdb_reportingClusterEndpointArray[i].flags, BDBREPORTING_HASBINDING_FLAG_MASK ) == BDBREPORTING_TRUE )
-    { 
+    {
       //Only do with valid entries (HasBinding==true)
       if( CheckNoIncrementFlag == BDBREPORTING_FALSE )
       {
@@ -1179,14 +1179,14 @@ static void bdb_clusterEndpointArrayIncrementAll( uint16 timeSinceLastReportIncr
       {
         if( bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt != BDBREPORTING_NOPERIODIC &&  bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt != BDBREPORTING_REPORTOFF )
         {
-          bdb_reportingClusterEndpointArray[i].timeSinceLastReport = (bdb_reportingClusterEndpointArray[i].timeSinceLastReport+timeSinceLastReportIncrement 
-                                                                      > bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt)? 
-                                                                      bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt: 
+          bdb_reportingClusterEndpointArray[i].timeSinceLastReport = (bdb_reportingClusterEndpointArray[i].timeSinceLastReport+timeSinceLastReportIncrement
+                                                                      > bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt)?
+                                                                      bdb_reportingClusterEndpointArray[i].consolidatedMaxReportInt:
                                                                       bdb_reportingClusterEndpointArray[i].timeSinceLastReport+timeSinceLastReportIncrement;
         }
       }
       FLAGS_TURNOFFFLAG( bdb_reportingClusterEndpointArray[i].flags, BDBREPORTING_NONEXTINCREMENT_FLAG_MASK ); //Always turn off, one shot functionality
-      
+
     }
   }
 }
@@ -1196,7 +1196,7 @@ static void bdb_clusterEndpointArrayIncrementAll( uint16 timeSinceLastReportIncr
 */
 
 
-/* 
+/*
 * Begin: Single linked list default attr cfg records methods
 */
 
@@ -1274,7 +1274,7 @@ static uint8 bdb_repAttrDefaultCfgRecordsLinkedListFreeAll( bdbRepAttrDefaultCfg
   return BDBREPORTING_SUCCESS;
 }
 
-/* 
+/*
 * End: Single linked list default attr cfg records methods
 */
 
@@ -1306,7 +1306,7 @@ static uint8 bdb_repAttrCfgRecordsArrayCreate( uint8 maxNumRepAttrConfRecords )
   return BDBREPORTING_SUCCESS;
 }
 
-static uint8 bdb_repAttrCfgRecordsArrayAdd( uint8 endpoint, uint16 cluster, uint16 attrID, uint16 minReportInt, uint16 maxReportInt, uint8  reportableChange[], 
+static uint8 bdb_repAttrCfgRecordsArrayAdd( uint8 endpoint, uint16 cluster, uint16 attrID, uint16 minReportInt, uint16 maxReportInt, uint8  reportableChange[],
                                            uint16 defMinReportInt, uint16 defMaxReportInt, uint8 defReportChange[] )
 {
   if( bdb_reportingAttrCfgRecordsArray==NULL )
@@ -1317,7 +1317,7 @@ static uint8 bdb_repAttrCfgRecordsArrayAdd( uint8 endpoint, uint16 cluster, uint
   {
     return BDBREPORTING_ERROR;
   }
-  
+
   bdb_reportingAttrCfgRecordsArray[bdb_reportingAttrCfgRecordsArrayCount].endpoint = endpoint;
   bdb_reportingAttrCfgRecordsArray[bdb_reportingAttrCfgRecordsArrayCount].cluster = cluster;
   bdb_reportingAttrCfgRecordsArray[bdb_reportingAttrCfgRecordsArrayCount].attrID = attrID;
@@ -1331,7 +1331,7 @@ static uint8 bdb_repAttrCfgRecordsArrayAdd( uint8 endpoint, uint16 cluster, uint
   bdb_reportingAttrCfgRecordsArray[bdb_reportingAttrCfgRecordsArrayCount].defaultMaxReportInt = defMaxReportInt;
   if( defReportChange != NULL )
   {
-    osal_memcpy( bdb_reportingAttrCfgRecordsArray[bdb_reportingAttrCfgRecordsArrayCount].defaultReportableChange, defReportChange, BDBREPORTING_MAX_ANALOG_ATTR_SIZE );   
+    osal_memcpy( bdb_reportingAttrCfgRecordsArray[bdb_reportingAttrCfgRecordsArrayCount].defaultReportableChange, defReportChange, BDBREPORTING_MAX_ANALOG_ATTR_SIZE );
   }
   bdb_reportingAttrCfgRecordsArrayCount++;
   return BDBREPORTING_SUCCESS;
@@ -1385,7 +1385,7 @@ static uint8 bdb_repAttrCfgRecordsArrayConsolidateValues( uint8 endpoint, uint16
       {
         *consolidatedMinReportInt = bdb_reportingAttrCfgRecordsArray[i].minReportInt;
       }
-      
+
       //Consolidate max value
       if( bdb_reportingAttrCfgRecordsArray[i].maxReportInt < *consolidatedMaxReportInt )
       {
@@ -1403,7 +1403,7 @@ static uint8 bdb_repAttrCfgRecordsArrayConsolidateValues( uint8 endpoint, uint16
 /*
 * End: Reporting attr configuration array methods
 */
-                  
+
 
 /*
 * Begin: Helper methods
@@ -1419,7 +1419,7 @@ static uint8 bdb_repAttrBuildClusterEndPointArrayBasedOnConfRecordsArray( void )
   if( bdb_reportingAttrCfgRecordsArray == NULL )
   {
     return BDBREPORTING_ERROR;
-  }           
+  }
   for( i=0; i<bdb_reportingAttrCfgRecordsArrayCount; i++ )
   {
     uint16 curEndpoint = bdb_reportingAttrCfgRecordsArray[i].endpoint;
@@ -1449,13 +1449,13 @@ static uint8 bdb_repAttrBuildClusterEndPointArrayBasedOnConfRecordsArray( void )
           bdb_InitReportAttrLiveValues( newItemData );
           newItemData->attrID = bdb_reportingAttrCfgRecordsArray[i].attrID;
           osal_memcpy( newItemData->reportableChange, bdb_reportingAttrCfgRecordsArray[i].reportableChange, BDBREPORTING_MAX_ANALOG_ATTR_SIZE );
-          
+
           //Read the attribute to keep the table updated
           if(BDBREPORTING_TRUE == bdb_RepFindAttrEntry(curEndpoint,curCluster,newItemData->attrID,&zclAttribute))
           {
             osal_memcpy(newItemData->lastValueReported, zclAttribute.dataPtr,BDBREPORTING_MAX_ANALOG_ATTR_SIZE);
-          }          
-          
+          }
+
           status = bdb_linkedListAttrAdd( &(bdb_reportingClusterEndpointArray[bdb_reportingClusterEndpointArrayCount-1].attrLinkedList), newItemData );
           if( status == BDBREPORTING_ERROR )
           {
@@ -1492,14 +1492,14 @@ static uint8 bdb_repAttrBuildClusterEndPointArrayBasedOnConfRecordsArray( void )
       {
         osal_memcpy(newItemData->lastValueReported, zclAttribute.dataPtr,BDBREPORTING_MAX_ANALOG_ATTR_SIZE);
       }
-      
+
       status = bdb_linkedListAttrAdd( &(bdb_reportingClusterEndpointArray[searchedIndex].attrLinkedList), newItemData );
       if( status == BDBREPORTING_ERROR )
       {
         returnStatus = BDBREPORTING_OUTOFMEMORYERROR;
         break;
       }
-    
+
     }
   }
   return returnStatus;
@@ -1508,7 +1508,7 @@ static uint8 bdb_repAttrBuildClusterEndPointArrayBasedOnConfRecordsArray( void )
 static void bdb_RepInitAttrCfgRecords( void )
 {
   bdb_RepConstructAttrCfgArray( ); //Here bdb_reportingAttrCfgRecordsArray is filled
-  
+
   uint8 status = osal_nv_item_init( ZCD_NV_BDBREPORTINGCONFIG, sizeof( bdbReportAttrCfgData_t )*bdb_reportingAttrCfgRecordsArrayCount, bdb_reportingAttrCfgRecordsArray );
   if( status == NV_OPER_FAILED )
   {
@@ -1526,7 +1526,7 @@ static void bdb_RepInitAttrCfgRecords( void )
         bdb_repAttrCfgRecordsArrayFreeAll(); //Clear previous cfg data
         uint16 sizeNVRecord = osal_nv_item_len(ZCD_NV_BDBREPORTINGCONFIG);
         uint8 attrCfgRecordsArrayCount = sizeNVRecord / sizeof(bdbReportAttrCfgData_t);
-        
+
         status =  bdb_repAttrCfgRecordsArrayCreate(attrCfgRecordsArrayCount);
         if( status == BDBREPORTING_ERROR )
         {
@@ -1534,9 +1534,9 @@ static void bdb_RepInitAttrCfgRecords( void )
         }
         osal_nv_read( ZCD_NV_BDBREPORTINGCONFIG,0, sizeof( bdbReportAttrCfgData_t )*attrCfgRecordsArrayCount ,bdb_reportingAttrCfgRecordsArray );
         bdb_reportingAttrCfgRecordsArrayCount = attrCfgRecordsArrayCount;
-      }     
-  }  
-  
+      }
+  }
+
   bdb_repAttrDefaultCfgRecordsLinkedListFreeAll( &attrDefaultCfgRecordLinkedList ); //Free the attr default cfg list
 }
 
@@ -1545,12 +1545,12 @@ static uint8 bdb_RepConstructAttrCfgArray( void )
    epList_t *epCur =  epList;
    uint8 status;
    uint8 i;
-   
+
    if( bdb_reportingAttrCfgRecordsArray != NULL )
    {
      bdb_repAttrCfgRecordsArrayFreeAll( );
    }
-   
+
    uint8 numRepAttr = 0;
    //First count the number of reportable attributes accross all endpoints
    for ( epCur = epList; epCur != NULL; epCur = epCur->nextDesc )
@@ -1566,7 +1566,7 @@ static uint8 bdb_RepConstructAttrCfgArray( void )
          {
            if( attrItem->attrs[i].attr.accessControl & ACCESS_REPORTABLE )
            {
-             numRepAttr++;  
+             numRepAttr++;
            }
          }
      }
@@ -1576,8 +1576,8 @@ static uint8 bdb_RepConstructAttrCfgArray( void )
    {
      return status;
    }
-     
-   
+
+
    for ( epCur = epList; epCur != NULL; epCur = epCur->nextDesc )
    {
      zclAttrRecsList* attrItem = zclFindAttrRecsList( epCur->epDesc->endPoint );
@@ -1599,36 +1599,36 @@ static uint8 bdb_RepConstructAttrCfgArray( void )
            if( lLItemFound == NULL )
            {
              //Add with default static values
-             uint8 changeValue[] = BDBREPORTING_DEFAULTCHANGEVALUE; 
-             status = bdb_repAttrCfgRecordsArrayAdd( epCur->epDesc->endPoint, attrItem->attrs[i].clusterID, 
-                                                    attrItem->attrs[i].attr.attrId, BDBREPORTING_DEFAULTMININTERVAL, BDBREPORTING_DEFAULTMAXINTERVAL, 
+             uint8 changeValue[] = BDBREPORTING_DEFAULTCHANGEVALUE;
+             status = bdb_repAttrCfgRecordsArrayAdd( epCur->epDesc->endPoint, attrItem->attrs[i].clusterID,
+                                                    attrItem->attrs[i].attr.attrId, BDBREPORTING_DEFAULTMININTERVAL, BDBREPORTING_DEFAULTMAXINTERVAL,
                                                     changeValue, BDBREPORTING_DEFAULTMININTERVAL, BDBREPORTING_DEFAULTMAXINTERVAL, changeValue );
            }
            else
            {
              //Add with user defined default values
-             status = bdb_repAttrCfgRecordsArrayAdd( epCur->epDesc->endPoint, attrItem->attrs[i].clusterID, 
-                                                    attrItem->attrs[i].attr.attrId, lLItemFound->data->minReportInt, lLItemFound->data->maxReportInt, 
-                                                    lLItemFound->data->reportableChange, lLItemFound->data->minReportInt, lLItemFound->data->maxReportInt, 
+             status = bdb_repAttrCfgRecordsArrayAdd( epCur->epDesc->endPoint, attrItem->attrs[i].clusterID,
+                                                    attrItem->attrs[i].attr.attrId, lLItemFound->data->minReportInt, lLItemFound->data->maxReportInt,
+                                                    lLItemFound->data->reportableChange, lLItemFound->data->minReportInt, lLItemFound->data->maxReportInt,
                                                     lLItemFound->data->reportableChange );
            }
          }
        }
      }
-     
+
    }
    return BDBREPORTING_SUCCESS;
-   
+
 }
 
 static uint8 bdb_RepLoadCfgRecords( void )
 {
-  uint8 status; 
+  uint8 status;
   if( bdb_reportingAttrCfgRecordsArrayCount>0 && bdb_reportingAttrCfgRecordsArray == NULL )
   {
     bdb_repAttrCfgRecordsArrayFreeAll( );
   }
-  
+
   status = osal_nv_item_init( ZCD_NV_BDBREPORTINGCONFIG, sizeof( bdbReportAttrCfgData_t )*bdb_reportingAttrCfgRecordsArrayCount, bdb_reportingAttrCfgRecordsArray );
   if( status == NV_OPER_FAILED )
   {
@@ -1646,7 +1646,7 @@ static uint8 bdb_RepLoadCfgRecords( void )
         //SUCCESS, There is NV data, read the data
         uint16 sizeNVRecord = osal_nv_item_len( ZCD_NV_BDBREPORTINGCONFIG );
         uint8 attrCfgRecordsArrayCount = sizeNVRecord / sizeof( bdbReportAttrCfgData_t );
-        
+
         status =  bdb_repAttrCfgRecordsArrayCreate( attrCfgRecordsArrayCount );
         if( status == BDBREPORTING_ERROR )
         {
@@ -1655,16 +1655,16 @@ static uint8 bdb_RepLoadCfgRecords( void )
         osal_nv_read( ZCD_NV_BDBREPORTINGCONFIG,0,sizeof( bdbReportAttrCfgData_t )*attrCfgRecordsArrayCount ,bdb_reportingAttrCfgRecordsArray );
         bdb_reportingAttrCfgRecordsArrayCount = attrCfgRecordsArrayCount;
         return BDBREPORTING_SUCCESS;
-      }     
-  }  
+      }
+  }
 }
 
 static void bdb_RepReport( uint8 specificCLusterEndpointIndex )
 {
   afAddrType_t dstAddr;
-  zclReportCmd_t *pReportCmd;
+  zclReportCmd_t *pReportCmd = NULL;
   uint8 i;
-  
+
   bdbReportAttrClusterEndpoint_t* clusterEndpointItem = NULL;
   if( specificCLusterEndpointIndex == BDBREPORTING_INVALIDINDEX )
   {
@@ -1681,34 +1681,44 @@ static void bdb_RepReport( uint8 specificCLusterEndpointIndex )
   // actually send the report
   if( clusterEndpointItem->consolidatedMaxReportInt != ZCL_REPORTING_OFF && clusterEndpointItem->attrLinkedList.numItems )
   {
+    uint8 *pAttrData = NULL;
+    uint8 *pAttrDataTemp = NULL;
+
     dstAddr.addrMode = (afAddrMode_t)AddrNotPresent;
     dstAddr.addr.shortAddr = 0;
     dstAddr.endPoint = clusterEndpointItem->endpoint;
     dstAddr.panId = _NIB.nwkPanId;
-    
+
+    // List of attributes to report
     pReportCmd = osal_mem_alloc( sizeof( zclReportCmd_t ) + (clusterEndpointItem->attrLinkedList.numItems * sizeof( zclReport_t )) );
-    if ( pReportCmd != NULL )
+    // List of attribute data
+    pAttrData = osal_mem_alloc(clusterEndpointItem->attrLinkedList.numItems * BDBREPORTING_MAX_ANALOG_ATTR_SIZE);
+    if ( (pReportCmd != NULL) && (pAttrData != NULL) )
     {
+      pAttrDataTemp = pAttrData;
       pReportCmd->numAttr = clusterEndpointItem->attrLinkedList.numItems;
       for ( i = 0; i < clusterEndpointItem->attrLinkedList.numItems; ++ i )
       {
         pReportCmd->attrList[i].attrID   = 0xFFFF;
         pReportCmd->attrList[i].dataType = 0xFF;
         pReportCmd->attrList[i].attrData = NULL;
-        
-        bdbLinkedListAttrItem_t* attrListItem = bdb_linkedListAttrGetAtIndex( &clusterEndpointItem->attrLinkedList, i );      
+
+        bdbLinkedListAttrItem_t* attrListItem = bdb_linkedListAttrGetAtIndex( &clusterEndpointItem->attrLinkedList, i );
         if(attrListItem!=NULL)
         {
-          pReportCmd->attrList[i].attrID = attrListItem->data->attrID;   
           zclAttribute_t attrRec;
+          pReportCmd->attrList[i].attrID = attrListItem->data->attrID;
           uint8 attrRes = bdb_RepFindAttrEntry( clusterEndpointItem->endpoint, clusterEndpointItem->cluster, attrListItem->data->attrID, &attrRec );
           if( attrRes == BDBREPORTING_TRUE )
           {
-            pReportCmd->attrList[i].dataType = attrRec.dataType;          
-            pReportCmd->attrList[i].attrData = attrRec.dataPtr;          
+            pReportCmd->attrList[i].dataType = attrRec.dataType;
+            pReportCmd->attrList[i].attrData = pAttrDataTemp;
+            // Copy data to current attribute data pointer
+            pAttrDataTemp = osal_memcpy(pAttrDataTemp, attrRec.dataPtr, BDBREPORTING_MAX_ANALOG_ATTR_SIZE);
+
             //Update last value reported
             if( zclAnalogDataType( attrRec.dataType ) )
-            { 
+            {
               //Only if the datatype is analog
               osal_memset( attrListItem->data->lastValueReported,0x00, BDBREPORTING_MAX_ANALOG_ATTR_SIZE );
               osal_memcpy( attrListItem->data->lastValueReported, attrRec.dataPtr, zclGetDataTypeLength( attrRec.dataType ) );
@@ -1720,8 +1730,14 @@ static void bdb_RepReport( uint8 specificCLusterEndpointIndex )
       zcl_SendReportCmd( clusterEndpointItem->endpoint, &dstAddr,
                          clusterEndpointItem->cluster, pReportCmd,
                          ZCL_FRAME_SERVER_CLIENT_DIR, BDB_REPORTING_DISABLE_DEFAULT_RSP, bdb_getZCLFrameCounter( ) );
-
+    }
+    if( (pReportCmd != NULL ) )
+    {
       osal_mem_free( pReportCmd );
+    }
+    if ( (pAttrData != NULL) )
+    {
+      osal_mem_free( pAttrData );
     }
   }
 }
@@ -1920,7 +1936,7 @@ static void bdb_RepRestartNextEventTimer( void )
 {
   uint32 timeMs;
   // convert from seconds to milliseconds
-  timeMs = 1000L * (bdb_reportingNextEventTimeout); 
+  timeMs = 1000L * (bdb_reportingNextEventTimeout);
   osal_start_timerEx( bdb_TaskID, BDB_REPORT_TIMEOUT, timeMs );
 }
 
@@ -1929,7 +1945,7 @@ static void bdb_RepSetupReporting( void )
   uint8 numArrayFlags, i;
   //Stop if reporting timer is active
   osal_stop_timerEx( bdb_TaskID, BDB_REPORT_TIMEOUT );
-  
+
   numArrayFlags = bdb_reportingClusterEndpointArrayCount;
   bdbReportFlagsHolder_t* arrayFlags = (bdbReportFlagsHolder_t *)osal_mem_alloc( sizeof( bdbReportFlagsHolder_t )*numArrayFlags );
   if( arrayFlags==NULL )
@@ -1942,15 +1958,15 @@ static void bdb_RepSetupReporting( void )
     arrayFlags[i].cluster =  bdb_reportingClusterEndpointArray[i].cluster;
     arrayFlags[i].flags =  bdb_reportingClusterEndpointArray[i].flags;
   }
-  
+
   if( bdb_reportingClusterEndpointArrayCount > 0 )
   {
     bdb_clusterEndpointArrayFreeAll( );
   }
-  
+
   //Built or rebuilt the clusterEndpoint array
   bdb_repAttrBuildClusterEndPointArrayBasedOnConfRecordsArray( );
-  
+
   for( i=0; i<numArrayFlags;i++ )
   {
      uint8 clusterEndpointIndex = bdb_clusterEndpointArraySearch( arrayFlags[i].endpoint, arrayFlags[i].cluster );
@@ -1962,7 +1978,7 @@ static void bdb_RepSetupReporting( void )
   osal_mem_free( arrayFlags );
 }
 
-                               
+
 static void bdb_RepStopEventTimer( void )
 {
   osal_stop_timerEx( bdb_TaskID, BDB_REPORT_TIMEOUT );
@@ -1988,12 +2004,12 @@ static void bdb_RepStopEventTimer( void )
 static endPointDesc_t* bdb_FindEpDesc( uint8 endPoint )
 {
   endPointDesc_t *CurrEpDescriptor = NULL;
-  
+
   epList_t *bdb_CurrEpDescriptorNextInList;
-  
+
   bdb_CurrEpDescriptorNextInList = bdb_HeadEpDescriptorList;
   CurrEpDescriptor = bdb_CurrEpDescriptorNextInList->epDesc;
-  
+
   while ( CurrEpDescriptor->endPoint != endPoint )
   {
     if ( bdb_CurrEpDescriptorNextInList->nextDesc->nextDesc != NULL )
@@ -2020,7 +2036,7 @@ static uint8 bdb_RepFindAttrEntry( uint8 endpoint, uint16 cluster, uint16 attrID
     if( epCur->epDesc->endPoint == endpoint )
     {
       zclAttrRecsList* attrItem = zclFindAttrRecsList( epCur->epDesc->endPoint );
-      
+
       if( (attrItem != NULL) && ( (attrItem->numAttributes > 0) && (attrItem->attrs != NULL) ) )
       {
         for ( i = 0; i < attrItem->numAttributes; i++ )
@@ -2047,7 +2063,7 @@ static uint8 bdb_RepFindAttrEntry( uint8 endpoint, uint16 cluster, uint16 attrID
 
 /*
 * End: Ztack zcl helper methods
-*/                   
+*/
 
 
 
@@ -2056,7 +2072,7 @@ static uint8 bdb_RepFindAttrEntry( uint8 endpoint, uint16 cluster, uint16 attrID
 *********************************************************************/
 
 /*
-* Begin: Reporting attr app API methods 
+* Begin: Reporting attr app API methods
 */
 
 
@@ -2071,26 +2087,26 @@ static uint8 bdb_RepFindAttrEntry( uint8 endpoint, uint16 cluster, uint16 attrID
  * @param       attrID - Reporable attribute ID
  * @param       minReportInt - Default value for minimum reportable interval
  * @param       maxReportInt - Default value for maximum reportable interval
- * @param       reportableChange - buffer containing attribute value that is the 
+ * @param       reportableChange - buffer containing attribute value that is the
  *              delta change to trigger a report
  *
  * @return      ZInvalidParameter - No endpoint, cluster, attribute ID found in simple desc
  *              ZFailure - No memory to allocate entry
  *              ZSuccess
- *              
+ *
  */
 ZStatus_t bdb_RepAddAttrCfgRecordDefaultToList( uint8 endpoint, uint16 cluster, uint16 attrID, uint16 minReportInt, uint16 maxReportInt, uint8* reportableChange )
 {
   uint8 status;
   epList_t *epCur;
   uint8 i;
-  
+
   if( bdb_reportingAcceptDefaultConfs == BDBREPORTING_FALSE )
   {
     //Don't accept anymore default attribute configurations
     return ZFailure;
   }
-  
+
   //Find if endpoint and cluster values are valid
   uint8 foundEndpCluster = BDBREPORTING_FALSE;
   for ( epCur = epList; epCur != NULL; epCur = epCur->nextDesc )
@@ -2123,7 +2139,7 @@ ZStatus_t bdb_RepAddAttrCfgRecordDefaultToList( uint8 endpoint, uint16 cluster, 
   {
     return ZInvalidParameter;
   }
-  
+
   //Add default cfg values to list
   bdbReportAttrDefaultCfgData_t* record = (bdbReportAttrDefaultCfgData_t *)osal_mem_alloc( sizeof( bdbReportAttrDefaultCfgData_t ) );
   if( record == NULL)
@@ -2131,21 +2147,21 @@ ZStatus_t bdb_RepAddAttrCfgRecordDefaultToList( uint8 endpoint, uint16 cluster, 
     return ZFailure; //Out of memory
   }
   bdb_repAttrDefaultCfgRecordInitValues( record );
-  
+
   record->endpoint = endpoint;
   record->cluster = cluster;
   record->attrID = attrID;
   record->minReportInt = minReportInt;
   record->maxReportInt = maxReportInt;
   osal_memcpy( record->reportableChange, reportableChange, BDBREPORTING_MAX_ANALOG_ATTR_SIZE );
-  
+
   status = bdb_repAttrDefaultCfgRecordsLinkedListAdd( &attrDefaultCfgRecordLinkedList, record );
   if( status != BDBREPORTING_SUCCESS )
   {
     osal_mem_free( record );
     return ZFailure; //Out of memory
   }
-  
+
   return ZSuccess;
 }
 
@@ -2154,7 +2170,7 @@ ZStatus_t bdb_RepAddAttrCfgRecordDefaultToList( uint8 endpoint, uint16 cluster, 
  /*********************************************************************
  * @fn          bdb_RepChangedAttrValue
  *
- * @brief       Notify BDB reporting attribute module about the change of an 
+ * @brief       Notify BDB reporting attribute module about the change of an
  *              attribute value to validate the triggering of a reporting attribute message.
  *
  * @param       endpoint
@@ -2167,22 +2183,22 @@ ZStatus_t bdb_RepAddAttrCfgRecordDefaultToList( uint8 endpoint, uint16 cluster, 
 ZStatus_t bdb_RepChangedAttrValue( uint8 endpoint, uint16 cluster, uint16 attrID )
 {
   uint8 indexClusterEndpoint = bdb_clusterEndpointArraySearch( endpoint, cluster );
-  if( indexClusterEndpoint == BDBREPORTING_INVALIDINDEX ) 
+  if( indexClusterEndpoint == BDBREPORTING_INVALIDINDEX )
   {
     //cluter-endpoint not found
     return ZInvalidParameter;
   }
-  if( FLAGS_CHECKFLAG( bdb_reportingClusterEndpointArray[indexClusterEndpoint].flags, BDBREPORTING_HASBINDING_FLAG_MASK ) == BDBREPORTING_FALSE ) 
+  if( FLAGS_CHECKFLAG( bdb_reportingClusterEndpointArray[indexClusterEndpoint].flags, BDBREPORTING_HASBINDING_FLAG_MASK ) == BDBREPORTING_FALSE )
   {
     //record has no binding
     return ZSuccess;
   }
-  if( bdb_reportingClusterEndpointArray[indexClusterEndpoint].consolidatedMaxReportInt == BDBREPORTING_REPORTOFF ) 
+  if( bdb_reportingClusterEndpointArray[indexClusterEndpoint].consolidatedMaxReportInt == BDBREPORTING_REPORTOFF )
   {
     //reporting if off for this cluster
     return ZSuccess;
   }
-  
+
   bdbReportAttrLive_t searchdata;
   searchdata.attrID = attrID;
   bdbLinkedListAttrItem_t* attrNodeFound = bdb_linkedListAttrSearch( &(bdb_reportingClusterEndpointArray[indexClusterEndpoint].attrLinkedList), &searchdata );
@@ -2190,14 +2206,14 @@ ZStatus_t bdb_RepChangedAttrValue( uint8 endpoint, uint16 cluster, uint16 attrID
   {
     return ZInvalidParameter; //Attr not found in cluster-endpoint array
   }
-  
+
   zclAttribute_t attrRec;
   uint8 attrRes = bdb_RepFindAttrEntry( endpoint, cluster, attrID, &attrRec );
   if( attrRes != BDBREPORTING_TRUE )
   {
     return ZInvalidParameter; //Attr not found in attributes app data
   }
-  
+
   //Get time of timer if active
   uint32 remainingTimeOfEvent = osal_get_timeoutEx( bdb_TaskID, BDB_REPORT_TIMEOUT );
   uint16 elapsedTime = 0;
@@ -2207,15 +2223,15 @@ ZStatus_t bdb_RepChangedAttrValue( uint8 endpoint, uint16 cluster, uint16 attrID
     elapsedTime = bdb_RepCalculateEventElapsedTime( remainingTimeOfEvent, bdb_reportingNextEventTimeout );
     isTimeRemaining =  BDBREPORTING_TRUE;
   }
-  
+
   if( bdb_reportingClusterEndpointArray[indexClusterEndpoint].consolidatedMinReportInt != BDBREPORTING_NOLIMIT &&
      (bdb_reportingClusterEndpointArray[indexClusterEndpoint].timeSinceLastReport + elapsedTime) <= bdb_reportingClusterEndpointArray[indexClusterEndpoint].consolidatedMinReportInt)
   {
       //Attr value has changed before minInterval, ommit reporting
       return ZSuccess;
   }
- 
-  
+
+
   if( zclAnalogDataType(attrRec.dataType) )
   {
     //Checking if   | lastvaluereported - currentvalue | >=  | changevalue |
@@ -2229,8 +2245,8 @@ ZStatus_t bdb_RepChangedAttrValue( uint8 endpoint, uint16 cluster, uint16 attrID
   {
     //Attr is discrete, just report without checking the changeValue
   }
-  
-  //Stop reporting  
+
+  //Stop reporting
   bdb_RepStopEventTimer( );
   bdb_RepReport( indexClusterEndpoint );
   if( isTimeRemaining == BDBREPORTING_TRUE )
@@ -2240,12 +2256,12 @@ ZStatus_t bdb_RepChangedAttrValue( uint8 endpoint, uint16 cluster, uint16 attrID
   bdb_clusterEndpointArrayUpdateAt( indexClusterEndpoint, 0, BDBREPORTING_IGNORE, BDBREPORTING_IGNORE ); //return time since last report to zero
   //Restart reporting
   bdb_RepStartReporting( );
-  
+
   return ZSuccess;
 }
 
 #endif //BDB_REPORTING
 
 /*
-* End: Reporting attr app API methods 
+* End: Reporting attr app API methods
 */

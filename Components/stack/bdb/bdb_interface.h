@@ -3,7 +3,7 @@
   Revised:        $Date: 2016-02-25 11:51:49 -0700 (Thu, 25 Feb 2016) $
   Revision:       $Revision: - $
 
-  Description:    This file contains the Base Device Behavior interface such as 
+  Description:    This file contains the Base Device Behavior interface such as
                   MACRO configuration and API.
 
 
@@ -50,23 +50,23 @@ extern "C"
  * INCLUDES
  */
 #include "bdb.h"
- 
+
  /*********************************************************************
  * CONSTANTS
  */
- 
+
 #define BDB_INSTALL_CODE_USE_IC_CRC  1    // IC + CRC are expected to be introduced (18 bytes), CRC is validated and TC link key is calcuated from it
 #define BDB_INSTALL_CODE_USE_KEY     2    // TC link key is expected (16 bytes), the buffer provided will be used as the key
-   
+
 
 //bdbTCLinkKeyExchangeMethod
 #define BDB_TC_LINK_KEY_EXCHANGE_APS_KEY     0x00
-#define BDB_TC_LINK_KEY_EXCHANGE_CBKE        0x01    //Not supported yet by spec   
-   
+#define BDB_TC_LINK_KEY_EXCHANGE_CBKE        0x01    //Not supported yet by spec
+
 //Status notifications on APS TC Link exchange process for a joining device
 #define BDB_TC_LK_EXCH_PROCESS_JOINING         0
 #define BDB_TC_LK_EXCH_PROCESS_EXCH_SUCCESS    1
-#define BDB_TC_LK_EXCH_PROCESS_EXCH_FAIL       2   
+#define BDB_TC_LK_EXCH_PROCESS_EXCH_FAIL       2
 
 
 #ifdef BDB_REPORTING
@@ -77,7 +77,7 @@ extern "C"
  /*********************************************************************
  * CONFIGURATION MACROS
  */
- 
+
  /**********************
  * General configuration
  */
@@ -88,36 +88,36 @@ extern "C"
 
 //Define if ZR devices will perform classical formation procedure or not (the network formed would be Distributed Network)
 #define BDB_ROUTER_FORM_DISTRIBUTED_NWK_ENABLED     1
-  
+
 //Define how IC are introduced see
 #define BDB_INSTALL_CODE_USE  BDB_INSTALL_CODE_USE_IC_CRC
 
-//Time after which the device will reset itself after failining on 
-//TCLK exchange procedure (more than BDB_DEFAULT_TC_LINK_KEY_EXCHANGE_ATTEMPS_MAX 
+//Time after which the device will reset itself after failining on
+//TCLK exchange procedure (more than BDB_DEFAULT_TC_LINK_KEY_EXCHANGE_ATTEMPS_MAX
 //attempts for the same request or Parent Lost during TCLK exchange process).
 //This reset will perform a FN reset
 #define BDB_TC_LINK_KEY_EXCHANGE_FAIL_LEAVE_TIMEOUT  5000
 
 #define BDB_TL_IDENTIFY_TIME                         0xFFFF
 
-//Default values for BDB attributes 
-#define BDB_DEFAULT_COMMISSIONING_GROUP_ID                 0xFFFF   
+//Default values for BDB attributes
+#define BDB_DEFAULT_COMMISSIONING_GROUP_ID                 0xFFFF
 #define BDB_DEFAULT_JOIN_USES_INSTALL_CODE_KEY             FALSE
 #define BDB_DEFAULT_PRIMARY_CHANNEL_SET                    DEFAULT_CHANLIST //BDB specification default is: 0x02108800
 #define BDB_DEFAULT_SCAN_DURATION                          0x04
 #define BDB_DEFAULT_SECONDARY_CHANNEL_SET                  (DEFAULT_CHANLIST ^ 0x07FFF800)      //BDB specification default is: (0x07FFF800 ^ 0x02108800)
 #define BDB_DEFAULT_TC_LINK_KEY_EXCHANGE_METHOD            BDB_TC_LINK_KEY_EXCHANGE_APS_KEY
 #define BDB_DEFAULT_TC_NODE_JOIN_TIMEOUT                   0x0F
-  
+
 #ifdef TP2_LEGACY_ZC
 #define BDB_DEFAULT_TC_REQUIRE_KEY_EXCHANGE                FALSE
 #else
-#define BDB_DEFAULT_TC_REQUIRE_KEY_EXCHANGE                TRUE 
+#define BDB_DEFAULT_TC_REQUIRE_KEY_EXCHANGE                TRUE
 #endif
-  
+
 #define BDB_DEFAULT_DEVICE_UNAUTH_TIMEOUT                  3000  //Time joining device waits for nwk before attempt association again. In BDB is known as apsSecurityTimeOutPeriod
 
-#define BDB_ALLOW_TL_STEALING                              TRUE 
+#define BDB_ALLOW_TL_STEALING                              TRUE
 
 
  /******************
@@ -129,24 +129,24 @@ extern "C"
 #define FINDING_AND_BINDING_PERIODIC_ENABLE          TRUE    // Boolean
 #define FINDING_AND_BINDING_PERIODIC_TIME            15       // in seconds
 
-// Number of attemtps that will be done to retrieve the simple desc from a target 
-// device or the IEEE Address if this is unknown. The number of attempts cannot 
+// Number of attemtps that will be done to retrieve the simple desc from a target
+// device or the IEEE Address if this is unknown. The number of attempts cannot
 // be greater than 36
-#define FINDING_AND_BINDING_MAX_ATTEMPTS             4        
+#define FINDING_AND_BINDING_MAX_ATTEMPTS             4
 
 
 //Your JOB: Set this value according to your application
-//This defines the time that initiator device will wait for Indentify query response 
+//This defines the time that initiator device will wait for Indentify query response
 //and simple descriptor from target devices. Consider Identify Query is broadcast while Simple Desc is unicast
-//Consider that ZED will have to wait longer since their responses will need to 
+//Consider that ZED will have to wait longer since their responses will need to
 //be pooled and will be dependent of the number of targets that is expected to be found
 #if ZG_BUILD_RTR_TYPE
 #define IDENTIFY_QUERY_RSP_TIMEOUT                         5000
 #define SIMPLEDESC_RESPONSE_TIMEOUT                        (ROUTE_DISCOVERY_TIME * 1000)  // Timeout for ZR
-#else   
+#else
 #define IDENTIFY_QUERY_RSP_TIMEOUT                         10000
 #define SIMPLEDESC_RESPONSE_TIMEOUT                        (3 * zgPollRate)      // Timeout for ZED  *Don't use time smaller than zgPollRate
-#endif   
+#endif
 
 
  /******************
@@ -159,7 +159,7 @@ extern "C"
 #ifndef TOUCHLINK_WORST_RSSI
 #define TOUCHLINK_WORST_RSSI                                    -40 // dBm
 #endif
- 
+
 // Pre-programmed RSSI correction offset (0x00-0x20)
 #ifndef TOUCHLINK_RSSI_CORRECTION
 #define TOUCHLINK_RSSI_CORRECTION                                0x00
@@ -182,10 +182,10 @@ extern "C"
 // For certification only:
 #define TOUCHLINK_ENC_KEY  TOUCHLINK_CERTIFICATION_ENC_KEY
 #define TOUCHLINK_LINK_KEY  TOUCHLINK_CERTIFICATION_LINK_KEY
-#define TOUCHLINK_KEY_INDEX TOUCHLINK_KEY_INDEX_CERT
+#define TOUCHLINK_KEY_INDEX TOUCHLINK_KEY_INDEX_MASTER
 
 // For internal EP's simple descriptor
-#define TOUCHLINK_INTERNAL_ENDPOINT                             13
+#define TOUCHLINK_INTERNAL_ENDPOINT                             42
 #define TOUCHLINK_INTERNAL_DEVICE_ID                            0xE15E
 #define TOUCHLINK_INTERNAL_FLAGS                                0
 #define TOUCHLINK_DEFAULT_IDENTIFY_TIME                         3
@@ -195,32 +195,32 @@ extern "C"
  */
 #ifdef BDB_REPORTING
 //Your JOB: Set this value according to your application
-//Maximum size in bytes used by reportable attributes registered in any 
+//Maximum size in bytes used by reportable attributes registered in any
 //endpoint for the application (for analog attributes)
 #ifndef BDBREPORTING_MAX_ANALOG_ATTR_SIZE
 #define BDBREPORTING_MAX_ANALOG_ATTR_SIZE 4
 #endif
 
 //Your JOB: Set this value according to your application
-//Max num of cluster with reportable attributes in any endpoint 
-//(eg. 2 endpoints with same cluster with reportable attributes counts as 2, 
+//Max num of cluster with reportable attributes in any endpoint
+//(eg. 2 endpoints with same cluster with reportable attributes counts as 2,
 //regardless of the number of reportable attributes in the cluster)
 #ifndef BDB_MAX_CLUSTERENDPOINTS_REPORTING
-#define BDB_MAX_CLUSTERENDPOINTS_REPORTING 5 
+#define BDB_MAX_CLUSTERENDPOINTS_REPORTING 5
 #endif
-  
+
 //Default values contants used in the bdb reporting code
 #define BDBREPORTING_DEFAULTMAXINTERVAL BDBREPORTING_REPORTOFF
-#define BDBREPORTING_DEFAULTMININTERVAL 0x000A    
+#define BDBREPORTING_DEFAULTMININTERVAL 0x000A
 
 //Define the DISABLE_DEFAULT_RSP flag for reporting attributes
 #define BDB_REPORTING_DISABLE_DEFAULT_RSP  FALSE
-#endif 
+#endif
 
 /*********************************************************************
  * ENUM
  */
- 
+
 
 enum
 {
@@ -235,9 +235,9 @@ enum
 
 enum
 {
-  BDB_COMMISSIONING_SUCCESS,       
-  BDB_COMMISSIONING_IN_PROGRESS,   
-  BDB_COMMISSIONING_NO_NETWORK,          
+  BDB_COMMISSIONING_SUCCESS,
+  BDB_COMMISSIONING_IN_PROGRESS,
+  BDB_COMMISSIONING_NO_NETWORK,
   BDB_COMMISSIONING_TL_TARGET_FAILURE,
   BDB_COMMISSIONING_TL_NOT_AA_CAPABLE,
   BDB_COMMISSIONING_TL_NO_SCAN_RESPONSE,
@@ -248,7 +248,7 @@ enum
   BDB_COMMISSIONING_FB_INITITATOR_IN_PROGRESS,
   BDB_COMMISSIONING_FB_NO_IDENTIFY_QUERY_RESPONSE,
   BDB_COMMISSIONING_FB_BINDING_TABLE_FULL,
-  BDB_COMMISSIONING_NETWORK_RESTORED,               
+  BDB_COMMISSIONING_NETWORK_RESTORED,
   BDB_COMMISSIONING_FAILURE,              //Generic failure status for no commissioning mode supported, not allowed, invalid state to perform commissioning
 };
 
@@ -256,22 +256,22 @@ enum
 
 typedef enum
 {
-  /** Instruct joining node to use Default Global Trust Center link key. 
+  /** Instruct joining node to use Default Global Trust Center link key.
   No key buffer requiered */
   zstack_UseDefaultGlobalTrustCenterLinkKey,
-  /** Instruct the joining node to use the provided install code (16 bytes 
+  /** Instruct the joining node to use the provided install code (16 bytes
   + 2 CRC bytes) to derive APS Link key to be used during joining */
   zstack_UseInstallCode,
-  /** Instruct the joining node to use the provided install code (16 bytes 
-  + 2 CRC bytes) to derive APS Link key to be used during joining. 
-  If it fails to decrypt Transport Key, it will automatically try Default 
+  /** Instruct the joining node to use the provided install code (16 bytes
+  + 2 CRC bytes) to derive APS Link key to be used during joining.
+  If it fails to decrypt Transport Key, it will automatically try Default
   Global Trust Center Link Key */
   zstack_UseInstallCodeWithFallback,
-  /** Instruct the joining node to use the provided APS Link key to be used 
+  /** Instruct the joining node to use the provided APS Link key to be used
   during joining (key size is 16 bytes) */
   zstack_UseAPSKey,
-  /** Instruct the joining node to use the provided APS Link key to be used 
-  during joining (key size is 16 bytes). If it fails to decrypt Transport 
+  /** Instruct the joining node to use the provided APS Link key to be used
+  during joining (key size is 16 bytes). If it fails to decrypt Transport
   Key, it will automatically try Default Global Trust Center Link Key  */
   zstack_UseAPSKeyWithFallback,
 }zstack_CentralizedLinkKeyModes_t;
@@ -279,7 +279,7 @@ typedef enum
  /*********************************************************************
  * TYPEDEFS
  */
- 
+
 typedef struct
 {
   uint8  bdbCommissioningStatus;
@@ -302,7 +302,7 @@ typedef void (*bdbGCB_CommissioningStatus_t)(bdbCommissioningModeMsg_t *bdbCommi
 typedef void (*bdbGCB_CBKETCLinkKeyExchange_t)( void );
 typedef void (*bdbGCB_TCLinkKeyExchangeProcess_t) (bdb_TCLinkKeyExchProcess_t* bdb_TCLinkKeyExchProcess);
 typedef void (*bdbGCB_FilterNwkDesc_t) (networkDesc_t *pBDBListNwk, uint8 count);
- 
+
 
 
 /*********************************************************************
@@ -311,7 +311,7 @@ typedef void (*bdbGCB_FilterNwkDesc_t) (networkDesc_t *pBDBListNwk, uint8 count)
 #if ( defined ( BDB_TL_TARGET ) && (BDB_TOUCHLINK_CAPABILITY_ENABLED == TRUE) )
 extern tlGCB_TargetEnable_t pfnTargetEnableChangeCB;
 #endif
- 
+
 extern bool touchLinkTargetEnabled;
 
  /*********************************************************************
@@ -327,7 +327,7 @@ extern bool touchLinkTargetEnabled;
  /*********************************************************************
  * FUNCTIONS
  */
-   
+
  /*****************************
  * GENERAL API
  */
@@ -341,7 +341,7 @@ UINT16 bdb_event_loop( byte task_id, UINT16 events );
  * @brief   Initialization for the task
  */
 void bdb_Init( byte task_id );
- 
+
 /*
  * @brief   Start the commissioning process setting the commissioning mode given.
  */
@@ -353,12 +353,12 @@ void bdb_StartCommissioning(uint8 mode);
 ZStatus_t bdb_SetIdentifyActiveEndpoint(uint8 activeEndpoint);
 
 /*
- * @brief   Stops Finding&Binding for initiator devices. The result of this process 
+ * @brief   Stops Finding&Binding for initiator devices. The result of this process
  * is reported in bdb notifications callback.
- */  
+ */
 void bdb_StopInitiatorFindingBinding(void);
 
-/*  
+/*
  * @brief   Get the next ZCL Frame Counter for packet sequence number
  */
 uint8 bdb_getZCLFrameCounter(void);
@@ -380,7 +380,7 @@ void bdb_setChannelAttribute(bool isPrimaryChannel, uint32 channel);
 void bdb_RegisterIdentifyTimeChangeCB( bdbGCB_IdentifyTimeChange_t pfnIdentifyTimeChange );
 
 /*
- * @brief   Register an Application's notification callback function to let 
+ * @brief   Register an Application's notification callback function to let
  *          know the application when a new bind is added to the binding table.
  */
 void bdb_RegisterBindNotificationCB( bdbGCB_BindNotification_t pfnBindNotification );
@@ -410,7 +410,7 @@ void bdb_setCommissioningGroupID(uint16 groupID);
   * @brief   Creates a CRC for the install code passed.
   */
  uint16 bdb_GenerateInstallCodeCRC(uint8 *installCode);
- 
+
 /*
  * @brief   Returns the state of bdbTrustCenterRequireKeyExchange attribute
  */
@@ -428,7 +428,7 @@ bool bdb_doTrustCenterRequireKeyExchange(void);
 ZStatus_t bdb_RepAddAttrCfgRecordDefaultToList(uint8 endpoint, uint16 cluster, uint16 attrID, uint16 minReportInt, uint16 maxReportInt, uint8* reportableChange);
 
 /*
- * @brief   Notify BDB reporting attribute module about the change of an 
+ * @brief   Notify BDB reporting attribute module about the change of an
  *          attribute value to validate the triggering of a reporting attribute message.
  */
 ZStatus_t bdb_RepChangedAttrValue(uint8 endpoint, uint16 cluster, uint16 attrID); //newvalue must a a buffer of size 8
@@ -458,8 +458,8 @@ void bdb_setTCRequireKeyExchange(bool isKeyExchangeRequired);
 ZStatus_t bdb_addInstallCode(uint8* pInstallCode, uint8* pExt);
 
 /*
- * @brief   Register a callback to receive notifications on the joining devices 
- *          and its status on TC link key exchange. 
+ * @brief   Register a callback to receive notifications on the joining devices
+ *          and its status on TC link key exchange.
  */
 void bdb_RegisterTCLinkKeyExchangeProcessCB( bdbGCB_TCLinkKeyExchangeProcess_t bdbGCB_TCLinkKeyExchangeProcess );
 
@@ -472,7 +472,7 @@ void bdb_RegisterTCLinkKeyExchangeProcessCB( bdbGCB_TCLinkKeyExchangeProcess_t b
  */
 
 /*
- * @brief   Register an Application's Enable/Disable callback function. 
+ * @brief   Register an Application's Enable/Disable callback function.
  *          Refer to touchLinkTarget_EnableCommissioning to enable/disable TL as target
  */
 void bdb_RegisterTouchlinkTargetEnableCB( tlGCB_TargetEnable_t pfnTargetEnableChange );
@@ -500,8 +500,8 @@ ZStatus_t bdb_setActiveCentralizedLinkKey(uint8 zstack_CentralizedLinkKeyModes, 
 
 
 /*
- * @brief   Register a callback in which the TC link key exchange procedure will 
- *          be performed by application.  The result from this operation must be notified to using the 
+ * @brief   Register a callback in which the TC link key exchange procedure will
+ *          be performed by application.  The result from this operation must be notified to using the
  *          bdb_CBKETCLinkKeyExchangeAttempt interface.
  *          NOTE: NOT CERTIFIABLE AT THE MOMENT OF THIS RELEASE
  */
@@ -517,7 +517,7 @@ void bdb_CBKETCLinkKeyExchangeAttempt(bool didSucces);
 /*
  * @brief   Register a callback in which the application gets the list of network
  *          descriptors got from active scan.
- *          Use bdb_nwkDescFree to release the network descriptors that are not 
+ *          Use bdb_nwkDescFree to release the network descriptors that are not
  *          of interest and leave those which are to be attempted.
  */
 void bdb_RegisterForFilterNwkDescCB(bdbGCB_FilterNwkDesc_t bdbGCB_FilterNwkDesc);
