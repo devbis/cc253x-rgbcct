@@ -95,7 +95,7 @@
 /*********************************************************************
  * GLOBAL VARIABLES
  */
- 
+
 //global attributes
 const uint16 zclSampleLight_clusterRevision_all = 0x0001; //currently all cluster implementations are according to ZCL6, which has revision #1. In the future it is possible that different clusters will have different revisions, so they will have to use separate attribute variables.
 
@@ -154,7 +154,7 @@ CONST zclCommandRec_t zclSampleLight_Cmds[] =
     COMMAND_TOGGLE,
     CMD_DIR_SERVER_RECEIVED
   },
-#ifdef ZCL_LEVEL_CONTROL
+#ifdef ZCL_LEVEL_CTRL
   ,{
     ZCL_CLUSTER_ID_GEN_LEVEL_CONTROL,
     COMMAND_LEVEL_MOVE_TO_LEVEL,
@@ -205,9 +205,9 @@ CONST uint8 zclCmdsArraySize = ( sizeof(zclSampleLight_Cmds) / sizeof(zclSampleL
  * ATTRIBUTE DEFINITIONS - Uses REAL cluster IDs
  */
 
-// NOTE: The attributes listed in the AttrRec must be in ascending order 
+// NOTE: The attributes listed in the AttrRec must be in ascending order
 // per cluster to allow right function of the Foundation discovery commands
- 
+
 CONST zclAttrRec_t zclSampleLight_Attrs[] =
 {
   // *** General Basic Cluster Attributes ***
@@ -320,7 +320,7 @@ CONST zclAttrRec_t zclSampleLight_Attrs[] =
       ACCESS_CONTROL_READ,
       (void *)&zclSampleLight_clusterRevision_all
     }
-  },  
+  },
 #endif
 
   // *** On/Off Cluster Attributes ***
@@ -342,7 +342,7 @@ CONST zclAttrRec_t zclSampleLight_Attrs[] =
       (void *)&zclSampleLight_clusterRevision_all
     }
   },
-  
+
 #ifdef ZCL_LEVEL_CTRL
   {
     ZCL_CLUSTER_ID_GEN_LEVEL_CONTROL,
@@ -437,7 +437,7 @@ CONST zclAttrRec_t zclSampleLight_Attrs[] =
       (void *)&zclSampleLight_clusterRevision_all
     }
   },
-#endif  
+#endif
   {
     ZCL_CLUSTER_ID_GEN_SCENES,
     {  // Attribute record
@@ -773,7 +773,7 @@ const cId_t zclSampleLight_InClusterList[] =
 };
 
 #define ZCLSAMPLELIGHT_MAX_INCLUSTERS   (sizeof(zclSampleLight_InClusterList) / sizeof(zclSampleLight_InClusterList[0]))
- 
+
 SimpleDescriptionFormat_t zclSampleLight_SimpleDesc =
 {
   SAMPLELIGHT_ENDPOINT,                  //  int Endpoint;
@@ -791,7 +791,7 @@ SimpleDescriptionFormat_t zclSampleLight_SimpleDesc =
   NULL //  byte *pAppInClusterList;
 };
 
-// Added to include ZLL Target functionality 
+// Added to include ZLL Target functionality
 #if defined ( BDB_TL_INITIATOR ) || defined ( BDB_TL_TARGET )
 bdbTLDeviceInfo_t tlSampleLight_DeviceInfo =
 {
@@ -814,7 +814,7 @@ bdbTLDeviceInfo_t tlSampleLight_DeviceInfo =
 /*********************************************************************
  * LOCAL FUNCTIONS
  */
- 
+
 /*********************************************************************
  * @fn      zclSampleLight_ResetAttributesToDefaultValues
  *
@@ -827,16 +827,16 @@ bdbTLDeviceInfo_t tlSampleLight_DeviceInfo =
 void zclSampleLight_ResetAttributesToDefaultValues(void)
 {
   int i;
-  
+
   zclSampleLight_LocationDescription[0] = 16;
   for (i = 1; i <= 16; i++)
   {
     zclSampleLight_LocationDescription[i] = ' ';
   }
-  
+
   zclSampleLight_PhysicalEnvironment = DEFAULT_PHYSICAL_ENVIRONMENT;
   zclSampleLight_DeviceEnable = DEFAULT_DEVICE_ENABLE_STATE;
-  
+
 #ifdef ZCL_IDENTIFY
   zclSampleLight_IdentifyTime = DEFAULT_IDENTIFY_TIME;
 #endif
@@ -850,7 +850,7 @@ void zclSampleLight_ResetAttributesToDefaultValues(void)
   zclSampleLight_LevelDefaultMoveRate = DEFAULT_MOVE_RATE;
 #endif
   zclSampleLight_OnOff = DEFAULT_ON_OFF_STATE;
-  
+
   zclSampleLight_IdentifyTime = 0;
 }
 
