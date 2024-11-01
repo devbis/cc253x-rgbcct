@@ -1481,7 +1481,7 @@
                     <state>xMT_ZDO_FUNC</state>
                     <state>xMT_ZDO_MGMT</state>
                     <state>xMT_APP_CNF_FUNC</state>
-                    <state>LCD_SUPPORTED=DEBUG</state>
+                    <state>xLCD_SUPPORTED=DEBUG</state>
                     <state>MULTICAST_ENABLED=FALSE</state>
                     <state>ZCL_READ</state>
                     <state>ZCL_DISCOVER</state>

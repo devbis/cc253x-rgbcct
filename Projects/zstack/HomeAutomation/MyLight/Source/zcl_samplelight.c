@@ -45,7 +45,7 @@
   This application is based on the common sample-application user interface. Please see the main
   comment in zcl_sampleapp_ui.c. The rest of this comment describes only the content specific for
   this sample applicetion.
-  
+
   Application-specific UI peripherals being used:
 
   - LEDs:
@@ -63,16 +63,16 @@
         Line2:
           LIGHT OFF / ON: shows the current state of the light.
       Note when ZCL_LEVEL_CTRL is enabled:
-        - If the light state is ON and the light level is X, and then the light receives the OFF or TOGGLE 
+        - If the light state is ON and the light level is X, and then the light receives the OFF or TOGGLE
           commands: The level will decrease gradually until it reaches 1, and only then the light state will
           be changed to OFF. The level then will be restored to X, with the state staying OFF. At this stage
-          the light is not lighting, and the level represent the target level for the next ON or TOGGLE 
+          the light is not lighting, and the level represent the target level for the next ON or TOGGLE
           commands.
         - If the light state is OFF and the light level is X, and then the light receives the ON or TOGGLE
           commands; The level will be set to 1, the light state will be set to ON, and then the level will
           increase gradually until it reaches level X.
         - Any level-setting command will affect the level directly, and may also affect the on/off state,
-          depending on the command's arguments.       
+          depending on the command's arguments.
 
 *********************************************************************/
 
@@ -94,13 +94,13 @@
 #include "zcl_diagnostic.h"
 
 #include "zcl_samplelight.h"
-   
+
 #include "bdb.h"
 #include "bdb_interface.h"
 
  //GP_UPDATE
 #include "gp_interface.h"
-   
+
 #include "onboard.h"
 
 /* HAL */
@@ -110,7 +110,7 @@
 
 #include "NLMEDE.h"
 
-// Added to include TouchLink initiator functionality 
+// Added to include TouchLink initiator functionality
 #if defined ( BDB_TL_INITIATOR )
   #include "bdb_touchlink_initiator.h"
 #endif // BDB_TL_INITIATOR
@@ -224,7 +224,7 @@ void zclSampleLight_UpdateLedState(void);
 /*********************************************************************
  * CONSTANTS
  */
-const uiState_t zclSampleLight_UiStatesMain[] = 
+const uiState_t zclSampleLight_UiStatesMain[] =
 {
   /*  UI_STATE_BACK_FROM_APP_MENU  */   {UI_STATE_DEFAULT_MOVE,       UI_STATE_TOGGLE_LIGHT,  UI_KEY_SW_5_PRESSED, &UI_ActionBackFromAppMenu}, //do not change this line, except for the second item, which should point to the last entry in this menu
   /*  UI_STATE_TOGGLE_LIGHT        */   {UI_STATE_BACK_FROM_APP_MENU, UI_STATE_DEFAULT_MOVE,  UI_KEY_SW_5_PRESSED, &zclSampleLight_UiActionToggleLight},
@@ -331,9 +331,9 @@ void zclSampleLight_Init( byte task_id )
 
   // Register for all key events - This app will handle all key events
   RegisterForKeys( zclSampleLight_TaskID );
-  
+
   bdb_RegisterCommissioningStatusCB( zclSampleLight_ProcessCommissioningStatus );
-  
+
   // Register for a test endpoint
   afRegister( &sampleLight_TestEp );
 
@@ -347,13 +347,13 @@ void zclSampleLight_Init( byte task_id )
     // Here the user could start the timer to save Diagnostics to NV
   }
 #endif
-  
-//GP_UPDATE  
-#if (ZG_BUILD_RTR_TYPE)  
+
+//GP_UPDATE
+#if (ZG_BUILD_RTR_TYPE)
   gp_RegisterCommissioningModeCB(gp_CommissioningMode);
   gp_RegisterGPChangeChannelReqCB(gp_ChangeChannelReq);
 #endif
-  
+
   zdpExternalStateTaskID = zclSampleLight_TaskID;
 
   UI_Init(zclSampleLight_TaskID, SAMPLEAPP_LCD_AUTO_UPDATE_EVT, SAMPLEAPP_KEY_AUTO_REPEAT_EVT, &zclSampleLight_IdentifyTime, APP_TITLE, &zclSampleLight_UiUpdateLcd, zclSampleLight_UiStatesMain);
@@ -415,7 +415,7 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
   }
 #endif
 
-#if ZG_BUILD_ENDDEVICE_TYPE    
+#if ZG_BUILD_ENDDEVICE_TYPE
   if ( events & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
   {
     bdb_ZedAttemptRecoverNwk();
@@ -464,12 +464,12 @@ static void zclSampleLight_HandleKeys( byte shift, byte keys )
 /*********************************************************************
  * @fn      gp_CommissioningMode
  *
- * @brief   Callback that notifies the application that gp Proxy is entering 
+ * @brief   Callback that notifies the application that gp Proxy is entering
  *          into commissioning mode
  *
- * @param   isEntering - 
+ * @param   isEntering -
  *
- * @return  
+ * @return
  */
 static void gp_CommissioningMode(bool isEntering)
 {
@@ -489,8 +489,8 @@ static void gp_CommissioningMode(bool isEntering)
 /*********************************************************************
  * @fn      gp_ChangeChannelReq
  *
- * @brief   Callback function to notify the application about a GP commissioning 
- * request that will change the current channel for at most 
+ * @brief   Callback function to notify the application about a GP commissioning
+ * request that will change the current channel for at most
  * gpBirectionalCommissioningChangeChannelTimeout ms
  *
  * @param   channel - Channel in which the commissioning will take place
@@ -500,9 +500,9 @@ static void gp_CommissioningMode(bool isEntering)
 static uint8 gp_ChangeChannelReq(void)
 {
   bool allowChangeChannel = TRUE;
-  
+
   //Check application state to decide if allow change channel or not
-  
+
   return allowChangeChannel;
 }
 
@@ -560,14 +560,14 @@ static void zclSampleLight_ProcessCommissioningStatus(bdbCommissioningModeMsg_t 
       }
     break;
     case BDB_COMMISSIONING_INITIALIZATION:
-      //Initialization notification can only be successful. Failure on initialization 
+      //Initialization notification can only be successful. Failure on initialization
       //only happens for ZED and is notified as BDB_COMMISSIONING_PARENT_LOST notification
-      
+
       //YOUR JOB:
       //We are on a network, what now?
-      
+
     break;
-#if ZG_BUILD_ENDDEVICE_TYPE    
+#if ZG_BUILD_ENDDEVICE_TYPE
     case BDB_COMMISSIONING_PARENT_LOST:
       if(bdbCommissioningModeMsg->bdbCommissioningStatus == BDB_COMMISSIONING_NETWORK_RESTORED)
       {
@@ -579,9 +579,9 @@ static void zclSampleLight_ProcessCommissioningStatus(bdbCommissioningModeMsg_t 
         osal_start_timerEx(zclSampleLight_TaskID, SAMPLEAPP_END_DEVICE_REJOIN_EVT, SAMPLEAPP_END_DEVICE_REJOIN_DELAY);
       }
     break;
-#endif 
+#endif
   }
-  
+
   UI_UpdateComissioningStatus(bdbCommissioningModeMsg);
 }
 
@@ -604,7 +604,7 @@ static void zclSampleLight_BasicResetCB( void )
   zclSampleLight_UpdateLedState();
 
   // update the display
-  UI_UpdateLcd( ); 
+  UI_UpdateLcd( );
 }
 
 /*********************************************************************
@@ -640,7 +640,7 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
   else if ( cmd == COMMAND_TOGGLE )
   {
 #ifdef ZCL_LEVEL_CTRL
-    if (zclSampleLight_LevelRemainingTime > 0) 
+    if (zclSampleLight_LevelRemainingTime > 0)
     {
       if (zclSampleLight_NewLevelUp)
       {
@@ -683,7 +683,7 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
 #endif
 
   zclSampleLight_UpdateLedState();
-  
+
   // update the display
   UI_UpdateLcd( );
 }
@@ -841,7 +841,7 @@ static void zclSampleLight_DefaultMove( uint8 OnOff )
     {
       zclSampleLight_LevelCurrentLevel = ATTR_LEVEL_MIN_LEVEL;
     }
-    
+
     if ( zclSampleLight_LevelOnLevel == ATTR_LEVEL_ON_LEVEL_NO_EFFECT )
     {
       // The last Level (before going OFF) should be used)
@@ -941,7 +941,7 @@ static void zclSampleLight_AdjustLightLevel( void )
       {
         zclSampleLight_OnOff = LIGHT_ON;
       }
-      
+
       if (( zclSampleLight_LevelChangeCmd != LEVEL_CHANGED_BY_LEVEL_CMD ) && ( zclSampleLight_LevelOnLevel == ATTR_LEVEL_ON_LEVEL_NO_EFFECT ))
       {
         zclSampleLight_LevelCurrentLevel = zclSampleLight_LevelLastLevel;
@@ -950,7 +950,7 @@ static void zclSampleLight_AdjustLightLevel( void )
   }
 
   zclSampleLight_UpdateLedState();
-  
+
   // display light level as we go
   UI_UpdateLcd( );
 
@@ -1050,7 +1050,7 @@ static void zclSampleLight_LevelControlStepCB( zclLCStep_t *pCmd )
       newLevel = zclSampleLight_LevelCurrentLevel - pCmd->amount;
     }
   }
-  
+
   zclSampleLight_LevelChangeCmd = LEVEL_CHANGED_BY_LEVEL_CMD;
 
   // move to the new level
@@ -1315,11 +1315,13 @@ void zclSampleLight_UpdateLedState(void)
   // set the LED1 based on light (on or off)
   if ( zclSampleLight_OnOff == LIGHT_ON )
   {
-    HalLedSet ( UI_LED_APP, HAL_LED_MODE_ON );
+    ENABLE_LAMP;
+    //HalLedSet ( UI_LED_APP, HAL_LED_MODE_ON );
   }
   else
   {
-    HalLedSet ( UI_LED_APP, HAL_LED_MODE_OFF );
+    DISABLE_LAMP;
+    //HalLedSet ( UI_LED_APP, HAL_LED_MODE_OFF );
   }
 }
 
