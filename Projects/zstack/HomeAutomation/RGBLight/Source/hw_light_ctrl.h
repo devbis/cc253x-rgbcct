@@ -64,7 +64,7 @@ extern "C"
 
 //#ifdef HAL_BOARD_ZLIGHT
   // ZLight reference board
-#define ZLL_HW_LED_LAMP  // enable HW PWM
+//#define ZLL_HW_LED_LAMP  // enable HW PWM
 //#endif
 
 #define PWM_FULL_DUTY_CYCLE 1000

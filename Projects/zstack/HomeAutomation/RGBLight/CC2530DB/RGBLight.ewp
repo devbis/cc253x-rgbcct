@@ -1479,6 +1479,7 @@
                     <state>xMT_ZDO_MGMT</state>
                     <state>xMT_APP_CNF_FUNC</state>
                     <state>MULTICAST_ENABLED=FALSE</state>
+                    <state>ZLL_HW_LED_LAMP</state>
                     <state>ZCL_READ</state>
                     <state>ZCL_DISCOVER</state>
                     <state>ZCL_WRITE</state>
